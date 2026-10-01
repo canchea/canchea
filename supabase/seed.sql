@@ -1,0 +1,2 @@
+-- La Fase 2 no crea usuarios ni roles de demostración.
+-- Los datos seed de negocio se incorporarán en las fases correspondientes.

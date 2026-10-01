@@ -1,69 +1,104 @@
+import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
+import { SearchPanel } from "@/components/search-panel";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
+import { Icon } from "@/components/ui/icon";
+import { VenueCard } from "@/components/venue-card";
+import { brand } from "@/config/brand";
+import { homeSections, sports } from "@/data/home";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <a className="skip-link" href="#contenido">Saltar al contenido</a>
+      <SiteHeader />
+      <main id="contenido">
+        <section className="hero" aria-labelledby="hero-title">
+          <div className="hero-media" aria-hidden="true">
+            <Image alt="" fill priority sizes="100vw" src="/images/hero-canchea.png" />
+            <div className="hero-overlay" />
+          </div>
+          <div className="container hero-content">
+            <div className="hero-copy">
+              <p className="eyebrow eyebrow--light"><Icon name="spark" size={17} /> Reserva. Juega. Disfruta.</p>
+              <h1 id="hero-title">Encuentra dónde <span>jugar</span></h1>
+              <p>{brand.description}</p>
+              <div className="trust-row">
+                <span><Icon name="shield" size={17} /> Reserva clara</span>
+                <span>Precios en bolivianos</span>
+              </div>
+            </div>
+            <SearchPanel />
+          </div>
+        </section>
+
+        <section className="sport-strip" aria-label="Deportes disponibles">
+          <div className="container sport-grid">
+            {sports.map((sport, index) => (
+              <Link href={`/buscar?deporte=${encodeURIComponent(sport.name)}&hora=20%3A00`} key={sport.name} className="sport-link">
+                <span className={`sport-symbol sport-symbol--${index + 1}`} aria-hidden="true">{sport.name.charAt(0)}</span>
+                <span><strong>{sport.name}</strong><small>{sport.detail}</small></span>
+                <Icon name="arrow" size={18} />
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="how-section" id="como-funciona" aria-labelledby="how-title">
+          <div className="container how-grid">
+            <div>
+              <p className="eyebrow">Una cancha, tres pasos</p>
+              <h2 id="how-title">Menos coordinación.<br />Más tiempo jugando.</h2>
+            </div>
+            <ol className="steps-list">
+              <li><span>01</span><div><strong>Elige tu deporte</strong><p>Filtra por zona, fecha y hora.</p></div></li>
+              <li><span>02</span><div><strong>Compara opciones</strong><p>Ve instalaciones, precio y disponibilidad.</p></div></li>
+              <li><span>03</span><div><strong>Asegura tu horario</strong><p>Reserva con una seña desde Bs 50.</p></div></li>
+            </ol>
+          </div>
+        </section>
+
+        <div id="explorar" className="venue-sections">
+          <div className="container demo-note" role="note">
+            <span>Vista de diseño</span>
+            <p>Estas tarjetas siguen siendo una muestra visual. El buscador superior ya consulta disponibilidad y precios reales.</p>
+          </div>
+          {homeSections.map((section) => (
+            <section className="venue-section" id={section.id} key={section.id} aria-labelledby={`${section.id}-title`}>
+              <div className="container">
+                <div className="section-heading">
+                  <div>
+                    <p className="eyebrow">{section.eyebrow}</p>
+                    <h2 id={`${section.id}-title`}>{section.title}</h2>
+                    <p>{section.description}</p>
+                  </div>
+                  <Link className="text-link" href="/buscar">Ver disponibilidad real →</Link>
+                </div>
+                <div className={`card-grid ${section.venues.length === 2 ? "card-grid--two" : ""}`}>
+                  {section.venues.map((venue) => <VenueCard key={`${section.id}-${venue.name}`} venue={venue} />)}
+                </div>
+              </div>
+            </section>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        <section className="owner-section" id="para-complejos" aria-labelledby="owner-title">
+          <div className="container owner-card">
+            <div className="owner-orbit" aria-hidden="true"><span /><span /><span /></div>
+            <div className="owner-copy">
+              <p className="eyebrow eyebrow--light">Para complejos deportivos</p>
+              <h2 id="owner-title">Convierte tus horarios libres en nuevas reservas.</h2>
+              <p>Registra tu complejo, presenta sus servicios y completa la verificación para aparecer en CANCHEA.</p>
+            </div>
+            <Link className="button button--accent" href="/auth/registro">Registrar mi complejo</Link>
+          </div>
+        </section>
       </main>
-    </div>
+      <SiteFooter />
+    </>
   );
 }

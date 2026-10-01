@@ -32,9 +32,18 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
+
+# local QA artifacts
+/artifacts/
+
+# one-off FINO HOGAR backup utilities kept outside the CANCHEA repository
+/scripts/export-fino-hogar-backups.ps1
+/scripts/local-export-receiver.ps1
+/scripts/storage-objects.json
 
 # typescript
 *.tsbuildinfo
