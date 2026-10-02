@@ -1,5 +1,5 @@
 import { getCurrentAccount } from "@/lib/auth/session";
-import { csvResponse, toCsv } from "@/lib/exports/csv";
+import { csvResponse, fetchAllRows, toCsv } from "@/lib/exports/csv";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET() {
@@ -8,7 +8,7 @@ export async function GET() {
   const supabase = await createClient();
   const { data: venue } = await supabase.from("venues").select("id, slug").eq("owner_id", account.user.id).maybeSingle();
   if (!venue) return new Response("Complejo no encontrado", { status: 404 });
-  const { data, error } = await supabase.from("bookings").select("public_code, status, starts_at, ends_at, duration_minutes, total_price_bob, deposit_amount_bob, commission_amount_bob, venue_net_amount_bob, refund_amount_bob, penalty_amount_bob, courts!bookings_court_id_fkey(name), profiles!bookings_player_id_fkey(first_name, last_name)").eq("venue_id", venue.id).order("starts_at", { ascending: false });
+  const { data, error } = await fetchAllRows((from, to) => supabase.from("bookings").select("public_code, status, starts_at, ends_at, duration_minutes, total_price_bob, deposit_amount_bob, commission_amount_bob, venue_net_amount_bob, refund_amount_bob, penalty_amount_bob, courts!bookings_court_id_fkey(name), profiles!bookings_player_id_fkey(first_name, last_name)").eq("venue_id", venue.id).order("starts_at", { ascending: false }).order("id").range(from, to));
   if (error) return new Response("No se pudo generar el reporte", { status: 500 });
   return csvResponse(`reservas-${venue.slug}.csv`, toCsv(
     ["codigo", "estado", "inicio", "fin", "duracion_min", "cancha", "jugador", "total_bob", "reserva_bob", "comision_bob", "neto_complejo_bob", "reembolso_bob", "penalizacion_bob"],

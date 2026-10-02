@@ -11,7 +11,14 @@
 
 - Correo temporal: una cuenta Gmail exclusiva para CANCHEA.
 - URL temporal: subdominio gratuito `*.vercel.app` bajo el plan Hobby, sólo para desarrollo y pruebas no comerciales.
-- El worker externo de notificaciones se ejecuta una vez al día por el límite de cron de Hobby. Para pruebas puntuales se puede invocar manualmente; antes del piloto operativo debe volver a una frecuencia de 15 minutos en una infraestructura compatible.
+- El worker externo de notificaciones lo dispara `pg_cron` cada 5 minutos (`canchea-notification-dispatch`) mediante `pg_net`, sólo cuando hay entregas pendientes. El cron diario de Vercel queda como respaldo. Requiere crear una vez por entorno, en el SQL Editor de Supabase:
+
+  ```sql
+  select vault.create_secret('https://TU_DOMINIO/api/notifications/process', 'canchea_notifications_url');
+  select vault.create_secret('EL_MISMO_VALOR_DE_CRON_SECRET', 'canchea_cron_secret');
+  ```
+
+  Sin esos secretos la tarea no hace nada. Las llamadas quedan registradas en `net._http_response`.
 - Antes de cobrar reservas o usar CANCHEA comercialmente, migrar desde Hobby a una modalidad permitida para uso comercial.
 
 ## Lista de salida
