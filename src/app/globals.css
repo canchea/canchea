@@ -440,6 +440,8 @@ select {
 
 .search-submit {
   min-height: 58px;
+  padding-inline: 14px;
+  white-space: nowrap;
   width: 100%;
 }
 
@@ -1346,12 +1348,13 @@ select {
   .desktop-nav { align-items: center; display: flex; gap: 30px; }
   .desktop-nav a { color: #3d4a45; font-size: 0.82rem; font-weight: 700; padding: 13px 0; }
   .desktop-nav a:hover { color: var(--brand-primary); }
+  .hero { overflow: visible; }
   .hero, .hero-content { min-height: 670px; }
   .hero-media img { object-position: center; }
   .hero-overlay { background: linear-gradient(90deg, rgba(4, 20, 14, 0.93) 0%, rgba(4, 20, 14, 0.67) 43%, rgba(4, 20, 14, 0.1) 76%), linear-gradient(0deg, rgba(4, 20, 14, 0.25), transparent 45%); }
   .hero-content { justify-content: center; padding-bottom: 72px; padding-top: 75px; }
   .hero-copy { margin-top: 0; }
-  .search-panel { bottom: -48px; grid-template-columns: 1fr 180px; left: 28px; max-width: calc(var(--container) - 56px); position: absolute; right: 28px; }
+  .search-panel { bottom: -48px; grid-template-columns: 1fr 180px; left: 28px; max-width: calc(var(--container) - 56px); position: absolute; right: 28px; z-index: 3; }
   .search-fields { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .search-field + .search-field { border-left: 1px solid #e1e9e5; border-radius: 0; }
   .sport-strip { padding-top: 58px; }
