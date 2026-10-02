@@ -54,6 +54,7 @@
 ### WEB-01 — Cabeceras defensivas incompletas
 
 **Severidad:** mayor  
+**Estado:** corregido y verificado en compilación local de producción; pendiente de confirmar en el despliegue público.
 **Estado observado:** la respuesta publicada incluye HSTS, pero no declara CSP, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` ni una política explícita contra framing.
 
 **Recomendación:** configurar cabeceras comunes desde `next.config.ts`, deshabilitar `poweredByHeader` y definir una CSP compatible con Supabase, Google OAuth, Vercel y los proveedores que finalmente se aprueben. La CSP no debe improvisarse antes de conocer todos los orígenes externos.
@@ -61,6 +62,7 @@
 ### WEB-02 — Contraste insuficiente en textos de acento
 
 **Severidad:** mayor  
+**Estado:** corregido en código.
 **Criterio:** WCAG 2.1 AA 1.4.3.
 
 - Verde principal `#22C55E` sobre blanco: **2.28:1**; no cumple 4.5:1 para texto normal.
@@ -73,6 +75,7 @@
 ### WEB-03 — Algunos objetivos táctiles son menores a 44 px
 
 **Severidad:** mayor para uso móvil  
+**Estado:** corregido en código.
 **Criterio:** objetivo táctil de 44 × 44 px adoptado por el sistema de diseño.
 
 Se detectaron controles interactivos con alturas de 38, 40, 42 o 43 px, principalmente en:

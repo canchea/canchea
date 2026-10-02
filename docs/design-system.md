@@ -15,6 +15,7 @@ Este sistema visual corresponde al brand kit recibido en la Fase 1. La referenci
 | Token | Valor | Uso |
 |---|---|---|
 | `brand-primary` | `#22C55E` | Verde principal y marca |
+| `brand-primary-text` | `#08783E` | Verde accesible para texto e iconos sobre fondos claros |
 | `brand-primary-dark` | `#0F3D2E` | Contraste y fondos oscuros |
 | `brand-secondary` | `#0F3D2E` | Textos y acentos secundarios |
 | `brand-accent` | `#A3E635` | Disponibilidad y foco |
@@ -22,7 +23,7 @@ Este sistema visual corresponde al brand kit recibido en la Fase 1. La referenci
 | `brand-surface` | `#FFFFFF` | Cards y formularios |
 | `brand-text` | `#0B0F0E` | Negro de marca y texto principal |
 | `brand-gray-secondary` | `#94A3B8` | Gris secundario oficial |
-| `brand-muted` | `#64748B` | Derivado accesible del gris secundario `#94A3B8` para texto pequeño |
+| `brand-muted` | `#5F6F82` | Derivado accesible del gris secundario `#94A3B8` para texto pequeño |
 | `brand-border` | `#DCE4E0` | Bordes derivados de la paleta |
 | `brand-success` | `#10B981` | Éxito |
 | `brand-warning` | `#B45309` | Extensión semántica para advertencias |
@@ -35,6 +36,8 @@ Tipografía: Inter variable, autoalojada por Next.js. Titulares en Bold, etiquet
 ### Button
 
 Variantes `primary`, `dark`, `accent` y estado futuro explícito. El botón verde principal usa texto negro porque la combinación `#22C55E` con blanco no alcanza contraste AA para texto normal. Mantiene foco de alto contraste y altura mínima de 50 px.
+
+El verde principal se conserva para marca, fondos y controles. Sobre superficies claras, los textos y los iconos usan `brand-primary-text` para mantener contraste AA.
 
 ### Search panel
 
