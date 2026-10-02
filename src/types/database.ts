@@ -23,6 +23,7 @@ export type Database = {
           metadata: Json
           occurred_at: string
           venue_id: string | null
+          visitor_id: string | null
         }
         Insert: {
           actor_id?: string | null
@@ -32,6 +33,7 @@ export type Database = {
           metadata?: Json
           occurred_at?: string
           venue_id?: string | null
+          visitor_id?: string | null
         }
         Update: {
           actor_id?: string | null
@@ -41,6 +43,7 @@ export type Database = {
           metadata?: Json
           occurred_at?: string
           venue_id?: string | null
+          visitor_id?: string | null
         }
         Relationships: [
           {
@@ -2133,6 +2136,7 @@ export type Database = {
       delete_my_pricing_rule: { Args: { p_rule_id: string }; Returns: string }
       delete_my_venue_photo: { Args: { p_photo_id: string }; Returns: string }
       get_booking_deposit_quote: { Args: { p_price: number }; Returns: number }
+      get_funnel_summary: { Args: { p_days?: number }; Returns: Json }
       get_court_availability: {
         Args: { p_court_id: string; p_date: string }
         Returns: {

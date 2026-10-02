@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createBookingHoldAction } from "@/app/reservar/actions";
 import { PrivateShell } from "@/components/auth/private-shell";
 import { SubmitButton } from "@/components/auth/submit-button";
+import { trackFunnelEvent } from "@/lib/analytics/track";
 import { getCurrentAccount } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,6 +30,13 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
   const duration = Number(params.duracion);
   const returnPath = `/reservar?${new URLSearchParams({ cancha: courtId, fecha: date, hora: time, duracion: String(duration) }).toString()}`;
   const account = await getCurrentAccount();
+
+  if (validUuid(courtId)) {
+    await trackFunnelEvent("slot_selected", {
+      actorId: account?.user.id ?? null,
+      metadata: { court_id: courtId, date, time, duration, authenticated: Boolean(account) },
+    });
+  }
 
   if (!account) redirect(`/auth/iniciar-sesion?continuar=${encodeURIComponent(returnPath)}`);
   if (account.profile?.role !== "player") redirect("/cuenta");

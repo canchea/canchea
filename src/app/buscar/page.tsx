@@ -6,6 +6,7 @@ import { SearchPanel } from "@/components/search-panel";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Icon } from "@/components/ui/icon";
+import { trackFunnelEvent } from "@/lib/analytics/track";
 import { createPublicClient } from "@/lib/supabase/server";
 import { filtersToSearchParams, normalizeSearchParams, SEARCH_PAGE_SIZE, type RawSearchParams } from "@/lib/search/params";
 
@@ -49,6 +50,20 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const total = Number(rows[0]?.total_count ?? 0);
   const totalPages = Math.max(1, Math.ceil(total / SEARCH_PAGE_SIZE));
   const hasCoordinates = filters.latitude !== null && filters.longitude !== null;
+
+  if (!error && filters.page === 1) {
+    await trackFunnelEvent("search_performed", {
+      metadata: {
+        sport: filters.sport,
+        zone: filters.zone,
+        date: filters.date,
+        time: filters.time,
+        duration: filters.duration,
+        sort: filters.sort,
+        result_count: total,
+      },
+    });
+  }
 
   return (
     <>

@@ -20,6 +20,7 @@ export const ownerNavigation = [
 export const adminNavigation = [
   { href: "/admin", label: "Resumen" },
   { href: "/admin/operaciones", label: "Operaciones" },
+  { href: "/admin/analitica", label: "Analítica" },
   { href: "/admin/configuracion", label: "Configuración" },
   { href: "/notificaciones", label: "Notificaciones" },
 ] as const;
