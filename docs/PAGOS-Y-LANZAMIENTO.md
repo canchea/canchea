@@ -25,7 +25,8 @@ Libélula queda como alternativa empresarial por su REST API, QR, tarjetas y fac
 
 - Pago mock completo y aislado para pruebas.
 - Holds, expiración, idempotencia, auditoría de webhooks y mayor contable completos.
-- Política de seña Bs 50 y comisión CANCHEA 10% parametrizadas.
+- Política de seña y comisión CANCHEA 10% parametrizadas. La seña es el mayor entre el monto base (Bs 50) y la comisión, sin superar el precio del horario: la comisión siempre queda cubierta por la seña y CANCHEA nunca debe cobrar saldos al complejo. En cancelaciones tempranas la penalidad se mantiene fija y se devuelve el resto de la seña.
+- Un propietario puede administrar varias sucursales; cada una tiene su ficha, canchas, horarios, revisión, prueba de 3 meses y liquidación propias.
 - Cancelaciones, reembolsos y liquidaciones completos.
 - El mock debe desactivarse en `platform_settings.mock_payments_enabled` antes de abrir producción.
 - La interfaz del proveedor real se activa solo después de contar con credenciales y documentación contractual.

@@ -10,6 +10,8 @@ import { ownerNavigation } from "@/config/dashboard-navigation";
 import { requireRole } from "@/lib/auth/session";
 import { addDays, dateInTimeZone, dayNames, minuteToTime } from "@/lib/courts/time";
 import { createClient } from "@/lib/supabase/server";
+import { getOwnerVenues } from "@/lib/venues/owner";
+import { VenueSwitcher } from "@/components/venues/venue-switcher";
 import type { CourtBlockKind } from "@/types/database";
 
 export const metadata: Metadata = { title: "Horarios y precios", robots: { index: false, follow: false } };
@@ -32,12 +34,13 @@ function formatLocalDateTime(value: string, timeZone: string) {
 export default async function AvailabilityPage({ searchParams }: { searchParams: Promise<{ cancha?: string }> }) {
   const [account, query] = await Promise.all([requireRole("venue_owner"), searchParams]);
   const supabase = await createClient();
-  const { data: venue } = await supabase.from("venues").select("id, commercial_name, status, timezone").eq("owner_id", account.user.id).maybeSingle();
+  const { venues: ownerVenues, activeVenueId } = await getOwnerVenues(account.user.id);
+  const { data: venue } = await supabase.from("venues").select("id, commercial_name, status, timezone").eq("id", activeVenueId).eq("owner_id", account.user.id).maybeSingle();
   const shellLinks = [...ownerNavigation];
 
   if (!venue || venue.status !== "approved") {
     return (
-      <PrivateShell links={shellLinks} title="Horarios y precios" description="Esta sección se habilita cuando tu complejo está aprobado.">
+      <PrivateShell links={shellLinks} title="Horarios y precios" description="Esta sección se habilita cuando tu complejo está aprobado."><VenueSwitcher activeVenueId={activeVenueId} returnTo="/propietario/disponibilidad" venues={ownerVenues} />
         <section className="private-card availability-empty"><h2>Complejo pendiente de aprobación</h2><p>Cuando tu complejo esté aprobado podrás definir horarios, precios y bloqueos por cancha.</p><Link className="button button--primary" href="/propietario">Revisar mi complejo</Link></section>
       </PrivateShell>
     );
@@ -49,7 +52,7 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
 
   if (!selectedCourt) {
     return (
-      <PrivateShell links={shellLinks} title="Horarios y precios" description="Configura la disponibilidad real de cada cancha.">
+      <PrivateShell links={shellLinks} title="Horarios y precios" description="Configura la disponibilidad real de cada cancha."><VenueSwitcher activeVenueId={activeVenueId} returnTo="/propietario/disponibilidad" venues={ownerVenues} />
         <section className="private-card availability-empty"><h2>Primero registra una cancha</h2><p>Necesitas al menos una cancha antes de definir disponibilidad y precios.</p><Link className="button button--primary" href="/propietario/canchas">Registrar cancha</Link></section>
       </PrivateShell>
     );
@@ -76,7 +79,7 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
   const enabledDurations = (durations ?? []).map((entry) => entry.duration_minutes);
 
   return (
-    <PrivateShell links={shellLinks} title="Horarios y precios" description={`Configura la operación de ${venue.commercial_name} sin crear reservas manuales.`}>
+    <PrivateShell links={shellLinks} title="Horarios y precios" description={`Configura la operación de ${venue.commercial_name} sin crear reservas manuales.`}><VenueSwitcher activeVenueId={activeVenueId} returnTo="/propietario/disponibilidad" venues={ownerVenues} />
       <section className="court-selector" aria-label="Seleccionar cancha">
         {courtRows.map((court) => (
           <Link className={court.id === selectedCourt.id ? "court-selector-card court-selector-card--active" : "court-selector-card"} href={`/propietario/disponibilidad?cancha=${court.id}`} key={court.id}>

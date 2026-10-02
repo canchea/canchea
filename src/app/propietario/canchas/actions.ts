@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import type { FormState } from "@/components/auth/auth-feedback";
 import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { getOwnerVenues } from "@/lib/venues/owner";
 import type { CourtPhotoKind } from "@/types/database";
 
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -21,7 +22,8 @@ function parseNumber(value: string, min: number, max: number) {
 }
 
 export async function saveCourtAction(_state: FormState, formData: FormData): Promise<FormState> {
-  await requireRole("venue_owner");
+  const account = await requireRole("venue_owner");
+  const { activeVenueId } = await getOwnerVenues(account.user.id);
 
   const courtId = text(formData, "court_id");
   const name = text(formData, "name");
@@ -42,6 +44,7 @@ export async function saveCourtAction(_state: FormState, formData: FormData): Pr
 
   const supabase = await createClient();
   const { data: court, error } = await supabase.rpc("save_my_court", {
+    p_venue_id: activeVenueId,
     p_court_id: (courtId || null) as string,
     p_name: name,
     p_sport_slug: sportSlug,

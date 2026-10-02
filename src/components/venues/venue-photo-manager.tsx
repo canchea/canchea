@@ -11,7 +11,7 @@ type PhotoWithUrl = VenuePhoto & { signedUrl: string };
 
 const kindLabels = { logo: "Logo", cover: "Portada", gallery: "Galería" } as const;
 
-export function VenuePhotoManager({ photos, disabled }: { photos: PhotoWithUrl[]; disabled: boolean }) {
+export function VenuePhotoManager({ venueId, photos, disabled }: { venueId: string; photos: PhotoWithUrl[]; disabled: boolean }) {
   const [state, action] = useActionState(uploadVenuePhotoAction, initialFormState);
 
   return (
@@ -35,6 +35,7 @@ export function VenuePhotoManager({ photos, disabled }: { photos: PhotoWithUrl[]
 
       {!disabled && (
         <form action={action} className="photo-upload-form">
+          <input name="venue_id" type="hidden" value={venueId} />
           <div className="form-grid">
             <div className="form-field"><label htmlFor="photo-kind">Tipo</label><select id="photo-kind" name="kind" required><option value="logo">Logo</option><option value="cover">Portada</option><option value="gallery">Galería</option></select></div>
             <div className="form-field"><label htmlFor="photo-alt">Descripción accesible</label><input id="photo-alt" maxLength={160} name="alt_text" placeholder="Cancha principal iluminada" required /></div>
