@@ -54,7 +54,7 @@
 ### WEB-01 — Cabeceras defensivas incompletas
 
 **Severidad:** mayor  
-**Estado:** corregido y verificado en compilación local de producción; pendiente de confirmar en el despliegue público.
+**Estado:** corregido y verificado tanto en compilación local de producción como en el despliegue público.
 **Estado observado:** la respuesta publicada incluye HSTS, pero no declara CSP, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` ni una política explícita contra framing.
 
 **Recomendación:** configurar cabeceras comunes desde `next.config.ts`, deshabilitar `poweredByHeader` y definir una CSP compatible con Supabase, Google OAuth, Vercel y los proveedores que finalmente se aprueben. La CSP no debe improvisarse antes de conocer todos los orígenes externos.
