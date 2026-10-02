@@ -2120,3 +2120,48 @@ select {
 .venue-switcher .button { min-height: 50px; }
 .venue-switcher p { display: grid; gap: 2px; margin: 0; }
 .venue-switcher p span { color: var(--brand-muted); font-size: .78rem; font-weight: 700; }
+
+/* Analítica del embudo */
+.analytics-periods { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.analytics-periods a {
+  align-items: center;
+  border: 1px solid var(--brand-border);
+  border-radius: 999px;
+  color: var(--brand-text);
+  display: inline-flex;
+  font-size: .8rem;
+  font-weight: 750;
+  min-height: 44px;
+  padding: 0 16px;
+  text-decoration: none;
+}
+.analytics-periods a.active { background: var(--brand-primary-dark); border-color: var(--brand-primary-dark); color: white; }
+
+.analytics-funnel { display: grid; gap: 14px; list-style: none; margin: 20px 0 0; padding: 0; }
+.analytics-funnel li { align-items: center; display: grid; gap: 8px 16px; grid-template-columns: minmax(0, 1fr); }
+.analytics-funnel-label { display: grid; gap: 2px; }
+.analytics-funnel-label span,
+.analytics-funnel-value span { color: var(--brand-muted); font-size: .74rem; }
+.analytics-funnel-bar,
+.analytics-ranking div { background: var(--brand-background); border-radius: 999px; height: 12px; overflow: hidden; }
+.analytics-funnel-bar i,
+.analytics-ranking i { background: var(--brand-primary); border-radius: inherit; display: block; height: 100%; min-width: 4px; }
+.analytics-funnel-value { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.analytics-funnel-value strong { font-size: 1.25rem; }
+
+.analytics-grid { display: grid; gap: 0 18px; }
+.analytics-ranking { display: grid; gap: 10px; list-style: none; margin: 16px 0 0; padding: 0; }
+.analytics-ranking li { align-items: center; display: grid; gap: 12px; grid-template-columns: minmax(80px, 1fr) 2fr auto; font-size: .82rem; }
+.analytics-ranking span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.analytics-table-wrap { margin-top: 16px; overflow-x: auto; }
+.analytics-table { border-collapse: collapse; font-size: .82rem; min-width: 420px; width: 100%; }
+.analytics-table th,
+.analytics-table td { border-bottom: 1px solid var(--brand-border); padding: 10px 8px; text-align: right; }
+.analytics-table th:first-child { text-align: left; }
+.analytics-table thead th { color: var(--brand-muted); font-size: .72rem; font-weight: 750; }
+
+@media (min-width: 760px) {
+  .analytics-funnel li { grid-template-columns: minmax(180px, 1.2fr) 2fr minmax(150px, .9fr); }
+  .analytics-grid { grid-template-columns: 1fr 1fr; }
+}

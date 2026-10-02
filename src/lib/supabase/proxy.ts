@@ -2,10 +2,13 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasSupabaseEnv, getSupabaseEnv } from "@/lib/supabase/env";
 import type { Database } from "@/types/database";
+import { ensureVisitorCookie, persistVisitorCookie } from "@/lib/analytics/visitor";
 
 export async function updateSession(request: NextRequest) {
+  const newVisitorId = ensureVisitorCookie(request);
+
   if (!hasSupabaseEnv()) {
-    return NextResponse.next({ request });
+    return persistVisitorCookie(NextResponse.next({ request }), newVisitorId);
   }
 
   let response = NextResponse.next({ request });
@@ -24,5 +27,5 @@ export async function updateSession(request: NextRequest) {
   });
 
   await supabase.auth.getClaims();
-  return response;
+  return persistVisitorCookie(response, newVisitorId);
 }
