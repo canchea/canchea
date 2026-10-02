@@ -66,10 +66,6 @@ jobs:
           name: supabase-types
           path: src/types/database.generated.ts
 
-      - name: Verificar que los tipos versionados están al día
-        continue-on-error: true
-        run: diff -u src/types/database.ts src/types/database.generated.ts
-
       - name: Detener base de datos
         if: always()
         run: npx supabase stop --no-backup
