@@ -42,3 +42,18 @@
 ## Criterio de avance
 
 El piloto puede pasar a cobros reales cuando no existan transacciones desbalanceadas, los casos críticos de cancelación estén validados, soporte pueda resolver reclamos, exista un proveedor de pago aprobado y el Mock esté deshabilitado.
+
+## Decisión de inversión móvil
+
+La web responsive es el piloto comercial y de producto de CANCHEA. Se utilizará para validar las interacciones, el mercado, el nicho, la operación y el volumen de reservas antes de invertir en aplicaciones móviles nativas.
+
+La aplicación móvil no se iniciará por una fecha predeterminada. Se evaluará cuando el piloto demuestre:
+
+- demanda sostenida de reservas;
+- repetición de jugadores;
+- deportes, zonas y perfiles que formen un nicho claro;
+- conversión medible desde búsqueda hasta reserva confirmada;
+- operación estable frente a cancelaciones, no-shows y soporte;
+- una economía por reserva capaz de justificar la inversión adicional.
+
+Fresha queda registrada únicamente como referencia funcional para la experiencia móvil: navegación inferior, búsqueda, mapa/lista, historial y perfil. La futura aplicación conservará la marca, los flujos deportivos y el lenguaje visual de CANCHEA. El detalle está documentado en `memory/projects/canchea.md`.
