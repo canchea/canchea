@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { normalizePhoneE164 } from "@/lib/auth/phone";
 import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { isUuid, setActiveVenueCookie } from "@/lib/venues/owner";
 import type { FormState } from "@/components/auth/auth-feedback";
 import type { Json, VenuePhotoKind } from "@/types/database";
 
@@ -23,6 +24,9 @@ function parseCoordinate(value: string, min: number, max: number) {
 
 export async function saveVenueAction(_state: FormState, formData: FormData): Promise<FormState> {
   await requireRole("venue_owner");
+
+  const venueId = text(formData, "venue_id");
+  if (venueId && !isUuid(venueId)) return { status: "error", message: "No encontramos la sucursal que intentas editar." };
 
   const commercialName = text(formData, "commercial_name");
   const description = text(formData, "description");
@@ -58,7 +62,8 @@ export async function saveVenueAction(_state: FormState, formData: FormData): Pr
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc("save_my_venue", {
+  const { data: savedVenue, error } = await supabase.rpc("save_my_venue", {
+    p_venue_id: (venueId || null) as string,
     p_commercial_name: commercialName,
     p_description: description,
     p_phone_e164: phone,
@@ -72,11 +77,12 @@ export async function saveVenueAction(_state: FormState, formData: FormData): Pr
     p_hours: hours as Json,
   });
 
-  if (error) {
+  if (error || !savedVenue) {
     return { status: "error", message: "No pudimos guardar el complejo. Revisa los datos e inténtalo nuevamente." };
   }
 
-  revalidatePath("/propietario");
+  await setActiveVenueCookie(savedVenue.id);
+  revalidatePath("/propietario", "layout");
   redirect("/propietario?guardado=1");
 }
 
@@ -86,6 +92,7 @@ export async function uploadVenuePhotoAction(_state: FormState, formData: FormDa
   const rawKind = text(formData, "kind");
   const kind: VenuePhotoKind | null = rawKind === "logo" || rawKind === "cover" || rawKind === "gallery" ? rawKind : null;
   const altText = text(formData, "alt_text");
+  const venueId = text(formData, "venue_id");
 
   if (!(file instanceof File) || file.size === 0) return { status: "error", message: "Selecciona una imagen." };
   if (!IMAGE_TYPES.has(file.type)) return { status: "error", message: "Usa una imagen JPG, PNG o WebP." };
@@ -93,10 +100,13 @@ export async function uploadVenuePhotoAction(_state: FormState, formData: FormDa
   if (!kind) return { status: "error", message: "Elige el uso de la imagen." };
   if (altText.length < 3 || altText.length > 160) return { status: "error", message: "Describe brevemente la imagen." };
 
+  if (!isUuid(venueId)) return { status: "error", message: "Guarda primero los datos del complejo." };
+
   const supabase = await createClient();
   const { data: venue } = await supabase
     .from("venues")
     .select("id, status")
+    .eq("id", venueId)
     .eq("owner_id", account.user.id)
     .maybeSingle();
 
@@ -114,6 +124,7 @@ export async function uploadVenuePhotoAction(_state: FormState, formData: FormDa
   if (uploadError) return { status: "error", message: "No pudimos subir la imagen. Verifica el formato e inténtalo nuevamente." };
 
   const { error: registerError } = await supabase.rpc("register_my_venue_photo", {
+    p_venue_id: venue.id,
     p_object_path: objectPath,
     p_kind: kind,
     p_alt_text: altText,
@@ -155,4 +166,25 @@ export async function submitVenueAction(formData: FormData) {
   revalidatePath("/propietario");
   revalidatePath("/admin");
   redirect("/propietario?enviado=1");
+}
+
+export async function selectOwnerVenueAction(formData: FormData) {
+  const account = await requireRole("venue_owner");
+  const venueId = text(formData, "venue_id");
+  const returnTo = text(formData, "return_to");
+  const destination = /^\/propietario(\/[a-z-]+)?$/.test(returnTo) ? returnTo : "/propietario/dashboard";
+
+  if (isUuid(venueId)) {
+    const supabase = await createClient();
+    const { data: venue } = await supabase
+      .from("venues")
+      .select("id")
+      .eq("id", venueId)
+      .eq("owner_id", account.user.id)
+      .maybeSingle();
+    if (venue) await setActiveVenueCookie(venue.id);
+  }
+
+  revalidatePath("/propietario", "layout");
+  redirect(destination);
 }

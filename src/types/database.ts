@@ -2132,6 +2132,7 @@ export type Database = {
       delete_my_court_photo: { Args: { p_photo_id: string }; Returns: string }
       delete_my_pricing_rule: { Args: { p_rule_id: string }; Returns: string }
       delete_my_venue_photo: { Args: { p_photo_id: string }; Returns: string }
+      get_booking_deposit_quote: { Args: { p_price: number }; Returns: number }
       get_court_availability: {
         Args: { p_court_id: string; p_date: string }
         Returns: {
@@ -2356,6 +2357,7 @@ export type Database = {
           p_alt_text: string
           p_kind: Database["public"]["Enums"]["venue_photo_kind"]
           p_object_path: string
+          p_venue_id: string
         }
         Returns: {
           alt_text: string
@@ -2457,6 +2459,7 @@ export type Database = {
       }
       save_my_court: {
         Args: {
+          p_venue_id: string
           p_capacity: number
           p_court_id: string
           p_duration_minutes: number[]
@@ -2515,6 +2518,7 @@ export type Database = {
       }
       save_my_venue: {
         Args: {
+          p_venue_id: string
           p_address: string
           p_city: string
           p_commercial_name: string

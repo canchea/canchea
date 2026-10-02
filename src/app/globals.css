@@ -2092,3 +2092,31 @@ select {
 .error-card h1 { font-size: clamp(2rem, 7vw, 4rem); letter-spacing: -.055em; line-height: 1; margin: 13px 0; }
 .error-card p { color: var(--brand-muted); line-height: 1.65; margin: 0; max-width: 540px; }
 .error-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+
+/* Multi-sucursal · selector de sucursal activa */
+.venue-switcher {
+  align-items: flex-end;
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding: 16px 18px;
+}
+
+.venue-switcher-form {
+  align-items: flex-end;
+  display: flex;
+  flex: 1 1 320px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.venue-switcher-form .form-field { flex: 1 1 240px; }
+.venue-switcher-form select { width: 100%; }
+.venue-switcher .button { min-height: 50px; }
+.venue-switcher p { display: grid; gap: 2px; margin: 0; }
+.venue-switcher p span { color: var(--brand-muted); font-size: .78rem; font-weight: 700; }

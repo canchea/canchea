@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    name: Lint, tipos y build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  database:
+    name: Migraciones y pruebas de base de datos
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DB_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      # Aplica todas las migraciones y el seed sobre un Postgres de Supabase limpio.
+      - name: Iniciar base de datos local
+        run: npx supabase db start
+
+      # Las pruebas son SQL transaccional que falla con raise exception.
+      - name: Ejecutar pruebas de base de datos
+        run: |
+          for file in supabase/tests/database/*.sql; do
+            echo "::group::$file"
+            psql "$DB_URL" -v ON_ERROR_STOP=1 -q -f "$file"
+            echo "::endgroup::"
+          done
+
+      - name: Generar tipos de Supabase
+        run: npx supabase gen types typescript --local > src/types/database.generated.ts
+
+      - name: Publicar tipos generados
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-types
+          path: src/types/database.generated.ts
+
+      - name: Detener base de datos
+        if: always()
+        run: npx supabase stop --no-backup

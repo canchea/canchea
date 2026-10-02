@@ -41,6 +41,7 @@ select public.complete_onboarding(
 );
 
 select public.save_my_venue(
+  null,
   'Complejo Fase Tres',
   'Complejo deportivo de prueba con espacios seguros y buena iluminación.',
   '+59170000031',
@@ -63,11 +64,13 @@ select public.save_my_venue(
 );
 
 select public.register_my_venue_photo(
+  (select id from public.venues where owner_id = (select auth.uid())),
   (select id::text || '/logo/test.png' from public.venues where owner_id = (select auth.uid())),
   'logo',
   'Logo del complejo de prueba'
 );
 select public.register_my_venue_photo(
+  (select id from public.venues where owner_id = (select auth.uid())),
   (select id::text || '/cover/test.jpg' from public.venues where owner_id = (select auth.uid())),
   'cover',
   'Portada del complejo de prueba'

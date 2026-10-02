@@ -48,6 +48,7 @@ npm run build
 - [Fases 11 a 14 — Administración, finanzas y confianza](docs/phase-11-to-14-operations.md)
 - [Fase 15 — QA y endurecimiento](docs/phase-15-qa.md)
 - [Fase 16 — Runbook del piloto](docs/phase-16-pilot-runbook.md)
+- [Pruebas E2E automatizadas](docs/e2e-testing.md)
 - [Auditoría final interna de la web](docs/web-final-audit.md)
 
 ## Estado del producto

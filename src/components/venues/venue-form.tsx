@@ -33,6 +33,7 @@ export function VenueForm({
 
   return (
     <form action={action} className="venue-form">
+      {venue && <input name="venue_id" type="hidden" value={venue.id} />}
       <fieldset disabled={disabled}>
         <div className="venue-form-section">
           <div className="section-heading">

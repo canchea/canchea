@@ -8,6 +8,8 @@ import { CourtPhotoManager } from "@/components/courts/court-photo-manager";
 import { ownerNavigation } from "@/config/dashboard-navigation";
 import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { getOwnerVenues } from "@/lib/venues/owner";
+import { VenueSwitcher } from "@/components/venues/venue-switcher";
 import type { CourtPhoto } from "@/types/database";
 
 export const metadata: Metadata = { title: "Mis canchas", robots: { index: false, follow: false } };
@@ -21,12 +23,13 @@ export default async function CourtsPage({
 }) {
   const [account, query] = await Promise.all([requireRole("venue_owner"), searchParams]);
   const supabase = await createClient();
-  const { data: venue } = await supabase.from("venues").select("id, commercial_name, slug, status").eq("owner_id", account.user.id).maybeSingle();
+  const { venues: ownerVenues, activeVenueId } = await getOwnerVenues(account.user.id);
+  const { data: venue } = await supabase.from("venues").select("id, commercial_name, slug, status").eq("id", activeVenueId).eq("owner_id", account.user.id).maybeSingle();
   const shellLinks = [...ownerNavigation];
 
   if (!venue || venue.status !== "approved") {
     return (
-      <PrivateShell links={shellLinks} title="Canchas" description="La configuración de canchas se habilita cuando el complejo está verificado.">
+      <PrivateShell links={shellLinks} title="Canchas" description="La configuración de canchas se habilita cuando el complejo está verificado."><VenueSwitcher activeVenueId={activeVenueId} returnTo="/propietario/canchas" venues={ownerVenues} />
         <section className="private-card court-gate-card">
           <span className="court-gate-icon" aria-hidden="true">✓</span>
           <div><h2>Primero necesitamos aprobar tu complejo</h2><p>Completa la ficha, agrega el logo y la portada, y envíala a revisión. Cuando el estado sea “Aprobado” podrás registrar todas tus canchas.</p></div>
@@ -82,7 +85,7 @@ export default async function CourtsPage({
       links={shellLinks}
       title={`Canchas de ${venue.commercial_name}`}
       description="Administra la ficha deportiva de cada espacio antes de configurar disponibilidad y precios."
-    >
+    ><VenueSwitcher activeVenueId={activeVenueId} returnTo="/propietario/canchas" venues={ownerVenues} />
       {query.guardado === "1" && <div className="page-notice page-notice--success">La cancha se guardó correctamente. Agrega una portada para poder activarla.</div>}
       {query.estado === "activada" && <div className="page-notice page-notice--success">La cancha está activa y ya aparece en la ficha pública.</div>}
       {query.estado === "pausada" && <div className="page-notice page-notice--success">La cancha quedó pausada y ya no es visible públicamente.</div>}

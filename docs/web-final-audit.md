@@ -104,6 +104,7 @@ Mediciones orientativas desde la auditoría:
 ### WEB-05 — Falta una prueba E2E automatizada del recorrido principal
 
 **Severidad:** media.
+**Estado:** cobertura pública implementada y aprobada en Chromium de escritorio y móvil, tanto localmente como contra producción. El escenario autenticado completo está versionado y pendiente únicamente de suministrar las contraseñas de las cuentas de prueba mediante variables de entorno.
 
 El proyecto verifica lint, tipos, build y base de datos, pero todavía no dispone de una prueba de navegador versionada para:
 

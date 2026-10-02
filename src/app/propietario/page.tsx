@@ -3,10 +3,12 @@ import Link from "next/link";
 import { PrivateShell } from "@/components/auth/private-shell";
 import { VenueForm } from "@/components/venues/venue-form";
 import { VenuePhotoManager } from "@/components/venues/venue-photo-manager";
+import { VenueSwitcher } from "@/components/venues/venue-switcher";
 import { ownerNavigation } from "@/config/dashboard-navigation";
 import { submitVenueAction } from "@/app/propietario/actions";
 import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { getOwnerVenues } from "@/lib/venues/owner";
 import { canEditVenue, venueStatusLabels } from "@/lib/venues/status";
 import type { VenuePhoto } from "@/types/database";
 
@@ -16,11 +18,15 @@ function formatDate(value: string) {
   return new Intl.DateTimeFormat("es-BO", { dateStyle: "medium", timeStyle: "short", timeZone: "America/La_Paz" }).format(new Date(value));
 }
 
-export default async function OwnerPage({ searchParams }: { searchParams: Promise<{ guardado?: string; enviado?: string; envio?: string }> }) {
+export default async function OwnerPage({ searchParams }: { searchParams: Promise<{ guardado?: string; enviado?: string; envio?: string; nueva?: string }> }) {
   const [account, query] = await Promise.all([requireRole("venue_owner"), searchParams]);
   const supabase = await createClient();
+  const { venues, activeVenueId } = await getOwnerVenues(account.user.id);
+  const creatingBranch = query.nueva === "1" && venues.length > 0;
   const [{ data: venue }, { data: services }] = await Promise.all([
-    supabase.from("venues").select("*").eq("owner_id", account.user.id).maybeSingle(),
+    creatingBranch
+      ? Promise.resolve({ data: null })
+      : supabase.from("venues").select("*").eq("id", activeVenueId).eq("owner_id", account.user.id).maybeSingle(),
     supabase.from("services").select("*").eq("is_active", true).order("sort_order"),
   ]);
 
@@ -50,10 +56,12 @@ export default async function OwnerPage({ searchParams }: { searchParams: Promis
 
   return (
     <PrivateShell
-      title={venue ? venue.commercial_name : `Hola, ${account.profile.first_name}`}
-      description={venue ? "Gestiona la información que revisará el equipo CANCHEA." : "Registra tu complejo para empezar el proceso de verificación."}
+      title={venue ? venue.commercial_name : creatingBranch ? "Nueva sucursal" : `Hola, ${account.profile.first_name}`}
+      description={venue ? "Gestiona la información que revisará el equipo CANCHEA." : creatingBranch ? "Registra otra sede de tu complejo. Cada sucursal tiene su propia ficha, canchas, horarios y revisión." : "Registra tu complejo para empezar el proceso de verificación."}
       links={[...ownerNavigation]}
     >
+      {!creatingBranch && <VenueSwitcher activeVenueId={activeVenueId} returnTo="/propietario" venues={venues} />}
+      {creatingBranch && <div className="page-notice page-notice--success">Estás creando una sucursal nueva. Tus otras sedes no se modifican.</div>}
       {query.guardado === "1" && <div className="page-notice page-notice--success">Los datos del complejo se guardaron correctamente.</div>}
       {query.enviado === "1" && <div className="page-notice page-notice--success">Tu complejo fue enviado a revisión. Te mostraremos aquí cualquier novedad.</div>}
       {query.envio === "error" && <div className="page-notice page-notice--error">Antes de enviar necesitas datos completos, al menos un horario abierto, logo y portada.</div>}
@@ -83,7 +91,7 @@ export default async function OwnerPage({ searchParams }: { searchParams: Promis
         />
       </section>
 
-      {venue && <VenuePhotoManager disabled={!editable} photos={photos} />}
+      {venue && <VenuePhotoManager disabled={!editable} photos={photos} venueId={venue.id} />}
 
       {venue && (
         <section className="private-card history-card">
