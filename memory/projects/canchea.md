@@ -75,6 +75,53 @@ Los umbrales numéricos para aprobar la inversión móvil se definirán después
 | Volver a reservar | Reservar nuevamente la misma cancha o complejo |
 | Historial | Próximas, completadas y canceladas |
 
+## Referencia funcional móvil para propietarios
+
+El video de la aplicación empresarial de Fresha compartido el 2 de octubre de 2026 se toma como referencia funcional para la experiencia de propietarios. No se copiarán su diseño, sus textos ni funciones ajenas al negocio deportivo.
+
+### Patrones observados y adaptación a CANCHEA
+
+| Patrón observado | Adaptación para el propietario CANCHEA |
+| --- | --- |
+| Calendario operativo con reservas por día y hora | Agenda diaria y semanal por cancha, con bloques de reserva, disponibilidad y estados visibles |
+| Acción central para crear una cita | Acción rápida para crear una reserva manual, bloquear una cancha o registrar una reserva presencial |
+| Selección de cliente existente, cliente nuevo o atención sin cita | Seleccionar jugador existente, crear jugador básico o registrar cliente invitado/sin cuenta |
+| Fecha, hora, repetición y servicio | Fecha, hora, duración, cancha, deporte y recurrencia cuando corresponda |
+| Resumen de ventas, registro, citas, ventas y pagos | KPIs, reservas, cobros, comisiones, reembolsos y liquidaciones |
+| Lista de clientes con búsqueda y filtros | Jugadores vinculados al complejo, historial permitido y búsqueda por nombre, teléfono o correo |
+| Miembros, turnos, fichajes y procesos de pago | Usuarios del complejo, roles, turnos operativos y permisos; nómina queda fuera del alcance inicial |
+| Presencia online, catálogo, marketing, informes y ajustes | Perfil público del complejo, canchas/precios, promociones futuras, reportes y configuración |
+| Reseñas, pagos y múltiples espacios de trabajo | Valoraciones, liquidaciones y cambio entre complejos autorizados |
+
+### Prioridad para el piloto web
+
+**Prioridad inmediata:**
+
+- calendario móvil por cancha;
+- creación rápida de reservas manuales;
+- cliente existente, nuevo o invitado sin cuenta;
+- selección de cancha, fecha, hora y duración;
+- estados de reserva y pago;
+- clientes provenientes de reservas;
+- KPIs básicos, comisiones y saldo por liquidar.
+
+**Después de validar operación y demanda:**
+
+- reservas recurrentes;
+- equipo con roles y permisos;
+- perfil público y gestión de valoraciones;
+- reportes ampliados y liquidaciones;
+- promociones y comunicación con clientes.
+
+**Fuera del alcance inicial:**
+
+- control de asistencia laboral;
+- nómina;
+- tarjetas regalo, bonos y membresías;
+- módulos de marketing avanzados y complementos.
+
+La principal conclusión es que el propietario necesita una herramienta operativa móvil y rápida, no una versión reducida del panel administrativo. El calendario y la creación manual de reservas deben ser los ejes de esa experiencia.
+
 ## Identidad visual obligatoria
 
 - Verde principal `#22C55E`.
