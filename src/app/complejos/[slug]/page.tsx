@@ -6,6 +6,7 @@ import { toggleCourtFavoriteAction, toggleVenueFavoriteAction } from "@/app/juga
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { addDays, dateInTimeZone } from "@/lib/courts/time";
+import { trackFunnelEvent } from "@/lib/analytics/track";
 import { getCurrentAccount } from "@/lib/auth/session";
 import { getSiteUrl } from "@/lib/supabase/env";
 import { createClient, createPublicClient } from "@/lib/supabase/server";
@@ -57,6 +58,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
   const account = await getCurrentAccount();
   const { data: venue } = await supabase.from("venues").select("*").eq("slug", slug).eq("status", "approved").maybeSingle();
   if (!venue) notFound();
+  await trackFunnelEvent("venue_viewed", { venueId: venue.id, actorId: account?.user.id ?? null, metadata: { date: requested.fecha, time: requested.hora } });
 
   const [{ data: photoRows }, { data: hours }, { data: links }, { data: courts }, { data: reviews }] = await Promise.all([
     supabase.from("venue_photos").select("*").eq("venue_id", venue.id).order("kind").order("sort_order"),
