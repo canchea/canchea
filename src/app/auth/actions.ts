@@ -63,8 +63,14 @@ export async function signUpAction(_state: FormState, formData: FormData): Promi
     return { status: "error", message: "Ingresa un correo electrónico válido." };
   }
 
-  if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
-    return { status: "error", message: "La contraseña debe tener al menos 8 caracteres, una letra y un número." };
+  if (
+    password.length < 10
+    || !/[a-z]/.test(password)
+    || !/[A-Z]/.test(password)
+    || !/\d/.test(password)
+    || !/[^A-Za-z0-9]/.test(password)
+  ) {
+    return { status: "error", message: "Usa al menos 10 caracteres e incluye mayúscula, minúscula, número y símbolo." };
   }
 
   if (password !== passwordConfirmation) {

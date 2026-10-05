@@ -17,15 +17,16 @@ export function SignupForm() {
       </div>
       <div className="form-field">
         <label htmlFor="signup-password">Contraseña</label>
-        <input aria-describedby="password-help" autoComplete="new-password" id="signup-password" minLength={8} name="password" required type="password" />
-        <small id="password-help">Mínimo 8 caracteres, con una letra y un número.</small>
+        <input aria-describedby="password-help" autoComplete="new-password" id="signup-password" minLength={10} name="password" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{10,}" required type="password" />
+        <small id="password-help">Mínimo 10 caracteres, con mayúscula, minúscula, número y símbolo.</small>
       </div>
       <div className="form-field">
         <label htmlFor="signup-password-confirmation">Confirmar contraseña</label>
-        <input autoComplete="new-password" id="signup-password-confirmation" minLength={8} name="password_confirmation" required type="password" />
+        <input autoComplete="new-password" id="signup-password-confirmation" minLength={10} name="password_confirmation" required type="password" />
       </div>
       <AuthFeedback state={state} />
       <SubmitButton pendingText="Creando cuenta…">Crear cuenta</SubmitButton>
+      <p className="auth-legal">Al completar tu perfil deberás aceptar nuestros <Link href="/terminos">términos</Link> y la <Link href="/privacidad">política de privacidad</Link>.</p>
       <p className="auth-switch">¿Ya tienes cuenta? <Link href="/auth/iniciar-sesion">Ingresa aquí</Link></p>
     </form>
   );

@@ -30,7 +30,7 @@ En Supabase Auth configurar:
 - Redirect URL local: `http://localhost:3000/auth/callback`
 - Redirect de confirmación: `http://localhost:3000/auth/confirm`
 - Confirmación de correo habilitada.
-- Contraseña mínima de 8 caracteres, con letras y números.
+- Contraseña mínima de 10 caracteres, con minúscula, mayúscula, número y símbolo.
 
 En la plantilla **Confirm signup**, usar:
 
@@ -88,8 +88,9 @@ Las cuentas administrativas aprovisionadas pueden entrar a `/admin` sin completa
 
 - Site URL: `http://localhost:3000`.
 - Redirects permitidos: `http://localhost:3000/auth/callback` y `http://localhost:3000/auth/confirm`.
-- Contraseña mínima: 8 caracteres, con al menos una letra y un número.
+- Contraseña mínima en la aplicación: 10 caracteres, con minúscula, mayúscula, número y símbolo.
+- La protección de Supabase contra contraseñas filtradas requiere plan Pro. Durante el piloto gratuito se compensa con la validación reforzada anterior; debe activarse antes de aceptar pagos reales.
 - Confirmación de correo obligatoria.
 - La plantilla personalizada de confirmación requiere SMTP propio en el plan actual. Mientras tanto se usa el flujo predeterminado hacia `/auth/callback`; `/auth/confirm` queda preparado para cuando se habilite SMTP.
 
-La política se verificó contra el endpoint real de Auth: Supabase rechazó tanto una contraseña de 6 caracteres como una contraseña de 8 caracteres formada únicamente por letras. Ningún usuario de prueba fue creado.
+La política remota base se verificó contra el endpoint real de Auth: Supabase rechazó tanto una contraseña de 6 caracteres como una contraseña de 8 caracteres formada únicamente por letras. La interfaz y la acción de servidor de CANCHEA aplican además la política reforzada de 10 caracteres. Ningún usuario de prueba fue creado durante esa verificación.
