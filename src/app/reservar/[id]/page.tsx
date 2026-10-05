@@ -44,11 +44,12 @@ export default async function BookingCheckoutPage({
   const { data: booking, error } = await supabase.rpc("get_my_booking_checkout", { p_booking_id: id });
   if (error || !booking) notFound();
 
-  const [{ data: court }, { data: history }, { data: paymentOrder }] = await Promise.all([
+  const [{ data: court }, { data: history }, { data: paymentOrderResult }] = await Promise.all([
     supabase.from("courts").select("name, venues(commercial_name, slug, zone, address), sports(name), sport_modalities(name)").eq("id", booking.court_id).maybeSingle(),
     supabase.from("booking_status_history").select("id, from_status, to_status, reason, created_at").eq("booking_id", booking.id).order("created_at"),
     supabase.rpc("get_my_payment_order", { p_booking_id: booking.id }),
   ]);
+  const paymentOrder = paymentOrderResult?.id ? paymentOrderResult : null;
   const venue = court?.venues;
   const startsAt = new Intl.DateTimeFormat("es-BO", { dateStyle: "long", timeStyle: "short", timeZone: "America/La_Paz" }).format(new Date(booking.starts_at));
   const pending = booking.status === "pending_payment" && booking.hold_expires_at;
