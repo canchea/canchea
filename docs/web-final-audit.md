@@ -39,6 +39,14 @@
 - No se detectaron vulnerabilidades conocidas en las 27 dependencias de producción auditadas.
 - Las áreas privadas no entregan contenido anónimo.
 
+### Supabase Advisor
+
+- La revisión del 5 de octubre no detectó tablas públicas sin RLS ni funciones privilegiadas con `search_path` inseguro.
+- El asesor marca como advertencia las funciones `SECURITY DEFINER` invocables por los roles previstos. Se verificó que las administrativas validan `super_admin`, las de propietarios validan identidad y pertenencia, y las de jugador usan `auth.uid()`; revocarlas rompería recorridos legítimos.
+- La consulta anónima de disponibilidad es intencional y expone únicamente horarios reservables de canchas aprobadas.
+- La protección contra contraseñas filtradas permanece desactivada porque requiere Supabase Pro. Para el piloto Free se exige una contraseña de 10 caracteres con mayúscula, minúscula, número y símbolo.
+- Los índices reportados como no utilizados se conservaron: el proyecto todavía no tiene tráfico suficiente para justificar eliminarlos con evidencia.
+
 ### Accesibilidad ya presente
 
 - Idioma principal `es` declarado.
