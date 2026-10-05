@@ -12,6 +12,10 @@
 
 # testing
 /coverage
+/playwright-report/
+/test-results/
+/blob-report/
+/debug.log
 
 # next.js
 /.next/
@@ -48,3 +52,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# tipos generados en CI
+/src/types/database.generated.ts

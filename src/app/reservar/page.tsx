@@ -37,7 +37,7 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
   }
 
   const supabase = await createClient();
-  const [{ data: court }, { data: slots }, { data: depositSetting }] = await Promise.all([
+  const [{ data: court }, { data: slots }] = await Promise.all([
     supabase
       .from("courts")
       .select("id, name, capacity, venues(commercial_name, slug, zone), sports(name), sport_modalities(name), court_surfaces(name)")
@@ -45,7 +45,6 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
       .eq("status", "active")
       .maybeSingle(),
     supabase.rpc("get_court_availability", { p_court_id: courtId, p_date: date }),
-    supabase.from("platform_settings").select("value").eq("key", "booking_deposit_amount").maybeSingle(),
   ]);
 
   const slot = (slots ?? []).find((candidate) => candidate.start_time.slice(0, 5) === time && candidate.duration_minutes === duration);
@@ -62,7 +61,11 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
     );
   }
 
-  const deposit = Number(depositSetting?.value ?? 50);
+  // Misma regla que create_booking_hold: la seña cubre siempre la comisión.
+  const { data: depositQuote } = await supabase.rpc("get_booking_deposit_quote", { p_price: Number(slot.price_bob) });
+  const price = Number(slot.price_bob);
+  const deposit = Number(depositQuote ?? Math.min(price, 50));
+  const formatBob = (value: number) => value.toFixed(Number.isInteger(value) ? 0 : 2);
   const venue = court.venues;
 
   return (
@@ -83,10 +86,10 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
         </section>
         <aside className="private-card booking-price-card">
           <p className="eyebrow">Resumen de pago</p>
-          <div><span>Precio de la cancha</span><strong>Bs {Number(slot.price_bob).toFixed(0)}</strong></div>
-          <div><span>Seña requerida</span><strong>Bs {deposit.toFixed(0)}</strong></div>
-          <div><span>Saldo en el complejo</span><strong>Bs {(Number(slot.price_bob) - deposit).toFixed(0)}</strong></div>
-          <p>En la Fase 8 conectaremos el pago mock. Por ahora validamos el motor de reserva y el hold.</p>
+          <div><span>Precio de la cancha</span><strong>Bs {formatBob(price)}</strong></div>
+          <div><span>Seña requerida</span><strong>Bs {formatBob(deposit)}</strong></div>
+          <div><span>Saldo en el complejo</span><strong>Bs {formatBob(price - deposit)}</strong></div>
+          <p>Pagarás la seña en el siguiente paso. El saldo se paga directamente en el complejo.</p>
           <form action={createBookingHoldAction}>
             <input name="court_id" type="hidden" value={courtId} />
             <input name="starts_at" type="hidden" value={slot.starts_at} />
