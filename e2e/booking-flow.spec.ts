@@ -39,7 +39,12 @@ test.describe("recorrido público de reserva", () => {
     const browserErrors: string[] = [];
     page.on("pageerror", (error) => browserErrors.push(error.message));
     page.on("console", (message) => {
-      if (message.type() === "error") browserErrors.push(message.text());
+      if (message.type() !== "error") return;
+      const location = message.location().url;
+      browserErrors.push(location ? `${message.text()} (${location})` : message.text());
+    });
+    page.on("response", (response) => {
+      if (response.status() >= 500) browserErrors.push(`${response.status()} ${response.url()}`);
     });
 
     await page.goto("/");
