@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { completeOnboardingAction } from "@/app/onboarding/actions";
 import { AuthFeedback, initialFormState } from "@/components/auth/auth-feedback";
@@ -30,8 +31,8 @@ export function OnboardingForm({ initialFirstName = "", initialLastName = "" }: 
       </div>
 
       <div className="consent-list">
-        <label><input name="accept_terms" required type="checkbox" /> <span>Acepto los términos y condiciones.</span></label>
-        <label><input name="accept_privacy" required type="checkbox" /> <span>Acepto la política de privacidad.</span></label>
+        <label><input name="accept_terms" required type="checkbox" /> <span>Acepto los <Link href="/terminos">términos y condiciones</Link>.</span></label>
+        <label><input name="accept_privacy" required type="checkbox" /> <span>Acepto la <Link href="/privacidad">política de privacidad</Link>.</span></label>
       </div>
 
       <AuthFeedback state={state} />

@@ -75,7 +75,7 @@ WHATSAPP_TEMPLATE_LANGUAGE=es
 - [ ] Verificar el dominio remitente en Resend.
 - [ ] Crear la app de Meta, registrar el número y aprobar la plantilla de WhatsApp.
 - [ ] Crear secretos distintos y largos para `SUPABASE_SECRET_KEY`, `CRON_SECRET` y webhooks.
-- [ ] Activar protección de contraseñas filtradas en Supabase Auth.
+- [ ] Activar protección de contraseñas filtradas al migrar a Supabase Pro. Mientras el piloto siga en Free, CANCHEA exige 10 caracteres con mayúscula, minúscula, número y símbolo.
 - [ ] Configurar las URLs de producción en Supabase Auth y Google OAuth.
 - [ ] Desactivar pagos mock en producción.
 - [ ] Ejecutar `npm run typecheck`, `npm run lint` y `npm run build`.

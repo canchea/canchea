@@ -1,6 +1,6 @@
 # Auditoría final interna de la web
 
-**Fecha:** 2 de octubre de 2026  
+**Fecha:** 5 de octubre de 2026
 **Alcance:** aplicación web responsive, rutas públicas, protección de rutas privadas, build, dependencias, SEO técnico, accesibilidad revisable desde código y rendimiento HTTP.  
 **Resultado:** apta con observaciones para un piloto controlado; no apta todavía para cobros reales ni apertura comercial general.
 
@@ -9,7 +9,7 @@
 - Hallazgos críticos: **0**.
 - Hallazgos mayores: **3**.
 - Hallazgos medios: **3**.
-- El build de producción compila correctamente con 34 rutas.
+- El build de producción compila correctamente con 38 rutas.
 - ESLint y TypeScript pasan sin errores.
 - Las dependencias de producción no reportan vulnerabilidades conocidas en `npm audit --omit=dev`.
 
@@ -101,12 +101,12 @@ Mediciones orientativas desde la auditoría:
 
 **Recomendación:** medir con tráfico real antes de optimizar. Si se confirma el problema, revisar el RPC de disponibilidad, consultas de fotografías firmadas, índices y estrategia de caché sin cachear disponibilidad vencida.
 
-### WEB-05 — Falta una prueba E2E automatizada del recorrido principal
+### WEB-05 — Prueba E2E automatizada del recorrido principal
 
 **Severidad:** media.
-**Estado:** cobertura pública implementada y aprobada en Chromium de escritorio y móvil, tanto localmente como contra producción. El escenario autenticado completo está versionado y pendiente únicamente de suministrar las contraseñas de las cuentas de prueba mediante variables de entorno.
+**Estado:** corregido. La cobertura pública fue aprobada en Chromium de escritorio y móvil, localmente y contra producción. El escenario autenticado también fue aprobado contra producción: un jugador creó y pagó una reserva Mock, y el propietario confirmó su trazabilidad. La comprobación automática del superadministrador queda opcional porque se utiliza la cuenta administrativa real y no se almacena su contraseña para pruebas.
 
-El proyecto verifica lint, tipos, build y base de datos, pero todavía no dispone de una prueba de navegador versionada para:
+La prueba de navegador versionada comprueba:
 
 1. buscar disponibilidad;
 2. abrir un complejo;
@@ -116,26 +116,26 @@ El proyecto verifica lint, tipos, build y base de datos, pero todavía no dispon
 6. completar el pago simulado;
 7. comprobar la reserva en jugador, propietario y administrador.
 
-**Recomendación:** añadir esta prueba antes de cambios frecuentes o de incorporar más desarrolladores.
+**Recomendación:** mantenerla en CI y ejecutarla contra producción después de cada cambio de alto riesgo. Las pruebas que crean datos deben continuar usando únicamente pagos Mock y cuentas de prueba.
 
 ### WEB-06 — Dependencias externas de lanzamiento
 
 **Severidad:** media para el piloto; bloqueante para cobros reales.
 
-Siguen pendientes el proveedor de pagos, dominio definitivo, correo transaccional, WhatsApp, secretos definitivos, protección contra contraseñas filtradas y configuración final de URLs OAuth.
+Siguen pendientes el proveedor de pagos, dominio definitivo, correo transaccional, WhatsApp, secretos definitivos, protección de Supabase contra contraseñas filtradas —disponible en plan Pro— y configuración final de URLs OAuth.
 
 ## Orden recomendado de cierre
 
 1. Corregir contraste y objetivos táctiles.
 2. Añadir cabeceras defensivas compatibles con los servicios actuales.
 3. Ejecutar nuevamente lint, tipos, build y comprobaciones HTTP.
-4. Añadir la prueba E2E del recorrido principal.
+4. Mantener la prueba E2E del recorrido principal y ampliarla cuando se conecte el proveedor de pagos real.
 5. Medir el rendimiento durante el piloto y optimizar sólo con evidencia.
 6. Integrar proveedores externos antes de aceptar dinero real.
 
 ## Limitaciones de esta auditoría
 
 - No se ejecutaron acciones que alteren datos productivos.
-- Los recorridos autenticados fueron validados por redirección, código, build y verificaciones documentadas previamente; no se creó una nueva reserva productiva durante esta auditoría.
+- Los recorridos autenticados se validaron con las cuentas de prueba y pago Mock. Las reservas creadas son datos de demostración, no cobros reales.
 - La captura headless del navegador no estuvo disponible en esta máquina. La revisión responsive se basó en HTML, CSS, breakpoints, tamaños táctiles y las capturas reales compartidas durante el desarrollo.
 - Antes de apertura general sigue siendo necesaria una prueba manual corta con teléfono real, teclado y lector de pantalla.

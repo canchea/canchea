@@ -24,14 +24,14 @@
 ## Lista de salida
 
 1. Crear el correo corporativo definitivo de CANCHEA y transferir las cuentas de Google, Supabase y futuros proveedores.
-2. Habilitar protección contra contraseñas filtradas en Supabase Auth.
+2. Mantener el requisito reforzado de 10 caracteres con mayúscula, minúscula, número y símbolo. La protección automática contra contraseñas filtradas requiere Supabase Pro y deberá activarse al migrar de plan antes de aceptar pagos reales.
 3. Configurar `SUPABASE_SECRET_KEY` y `CANCHEA_MOCK_WEBHOOK_SECRET` sólo en el servidor.
 4. Elegir proveedor QR/pagos, email y WhatsApp; implementar sus adaptadores y webhooks en sandbox.
 5. Ejecutar una reserva completa por rol: jugador, propietario y super admin.
 6. Validar cancelación temprana, tardía y no-show con el equipo operativo.
 7. Confirmar quién procesa reembolsos y quién autoriza liquidaciones.
 8. Revisar que `mock_payments_enabled` esté en `false` antes de aceptar pagos reales.
-9. Publicar términos, privacidad, política de cancelación y canal de soporte.
+9. Revisar jurídicamente y ratificar las páginas piloto ya publicadas de términos, privacidad, cancelaciones y soporte antes de cobrar dinero real.
 10. Monitorear diariamente errores, reservas, conversión, reclamos, reembolsos y ledger.
 11. Configurar `NEXT_PUBLIC_SITE_URL` con el dominio definitivo y comprobar canonical, Open Graph, `robots.txt` y `sitemap.xml` en producción.
 12. Registrar el sitemap en Google Search Console cuando el dominio esté público.

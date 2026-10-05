@@ -76,6 +76,22 @@ test.describe("recorrido público de reserva", () => {
   });
 });
 
+test.describe("información pública del piloto", () => {
+  const pages = [
+    ["/terminos", "Términos y condiciones"],
+    ["/privacidad", "Política de privacidad"],
+    ["/cancelaciones", "Política de cancelaciones"],
+    ["/soporte", "Soporte CANCHEA"],
+  ] as const;
+
+  for (const [path, heading] of pages) {
+    test(`publica ${heading}`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
+    });
+  }
+});
+
 test.describe.serial("@authenticated reserva con pago Mock y trazabilidad por rol", () => {
   let bookingCode = "";
 
