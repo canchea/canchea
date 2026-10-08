@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createBookingHoldAction } from "@/app/reservar/actions";
 import { PrivateShell } from "@/components/auth/private-shell";
 import { SubmitButton } from "@/components/auth/submit-button";
+import { playerNavigation } from "@/config/dashboard-navigation";
 import { getCurrentAccount } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
@@ -50,7 +51,7 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
   const slot = (slots ?? []).find((candidate) => candidate.start_time.slice(0, 5) === time && candidate.duration_minutes === duration);
   if (!court || !slot) {
     return (
-      <PrivateShell title="Este horario ya no está disponible" description="Otra persona pudo reservarlo o el horario dejó de cumplir las reglas del complejo.">
+      <PrivateShell title="Este horario ya no está disponible" description="Otra persona pudo reservarlo o el horario dejó de cumplir las reglas del complejo." links={[...playerNavigation]}>
         <section className="private-card booking-unavailable">
           <span className="status-dot status-dot--warning">Disponibilidad actualizada</span>
           <h2>Elige otro horario</h2>
@@ -69,7 +70,7 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
   const venue = court.venues;
 
   return (
-    <PrivateShell title="Revisa tu reserva" description="Confirma los datos antes de iniciar el bloqueo temporal de cinco minutos.">
+    <PrivateShell title="Revisa tu reserva" description="Confirma los datos antes de iniciar el bloqueo temporal de cinco minutos." links={[...playerNavigation]}>
       <div className="booking-review-grid">
         <section className="private-card booking-review-card">
           {params.estado === "no-disponible" ? <p className="form-feedback form-feedback--error" role="alert">Ese horario acaba de ser tomado. Elige otra opción.</p> : null}
