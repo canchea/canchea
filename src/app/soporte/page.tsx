@@ -46,6 +46,11 @@ export default function SupportPage() {
           title: "6. Seguimiento",
           content: <p>Durante el piloto priorizaremos problemas que impidan jugar, afecten una reserva o comprometan una cuenta. Mantendremos la comunicación en el mismo correo o reclamo para conservar la trazabilidad.</p>,
         },
+        {
+          id: "instalacion",
+          title: "7. Instalar CANCHEA en el teléfono",
+          content: <><p>Puedes usar el piloto como una aplicación, sin descargarla desde una tienda.</p><ul><li>Android con Chrome: abre el menú del navegador y elige <strong>Instalar aplicación</strong> o <strong>Agregar a pantalla principal</strong>.</li><li>iPhone con Safari: toca <strong>Compartir</strong> y luego <strong>Agregar a inicio</strong>.</li></ul><p>La instalación crea el icono de CANCHEA y abre la web en una ventana independiente. Las reservas siguen necesitando conexión a internet.</p></>,
+        },
       ]}
     />
   );
