@@ -161,6 +161,17 @@ test.describe.serial("@authenticated reserva con pago Mock y trazabilidad por ro
     await signOut(page);
   });
 
+  test("el super admin ve el dashboard informativo", async ({ page }) => {
+    test.skip(!adminEmail || !adminPassword, "Define las credenciales E2E del administrador para comprobar el dashboard.");
+    await signIn(page, adminEmail!, adminPassword!);
+    await page.goto("/admin?periodo=30");
+    await expect(page.getByRole("heading", { name: "Dashboard de negocio" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Indicadores clave" }).getByText("Ingreso CANCHEA", { exact: true })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Periodo del dashboard" }).getByRole("link", { name: "30 días" })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("heading", { name: "Reservas por periodo" })).toBeVisible();
+    await signOut(page);
+  });
+
   test("el super admin ve la reserva en operaciones", async ({ page }) => {
     test.skip(!adminEmail || !adminPassword, "Define las credenciales E2E del administrador para comprobar operaciones.");
     test.skip(!bookingCode, "La reserva del jugador no llegó a crearse.");
