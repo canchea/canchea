@@ -19,21 +19,15 @@ export function SearchResultCard({ result, eager = false }: { result: SearchResu
   ].filter((value, index, values): value is string => Boolean(value) && values.indexOf(value) === index).slice(0, 4);
   const detailParams = new URLSearchParams({
     fecha: result.slot_date,
-    hora: formatTime(result.start_time),
+    desde: result.slot_date,
     cancha: result.court_id,
-  });
-  const bookingParams = new URLSearchParams({
-    cancha: result.court_id,
-    fecha: result.slot_date,
-    hora: formatTime(result.start_time),
-    duracion: String(result.duration_minutes),
   });
 
   return (
     <article className="search-result-card">
       <div className="search-result-media">
         {result.signedCoverUrl ? (
-          <Image alt={result.cover_alt_text ?? `Cancha ${result.court_name}`} fill loading={eager ? "eager" : "lazy"} sizes="(max-width: 760px) 100vw, (max-width: 1120px) 42vw, 360px" src={result.signedCoverUrl} />
+          <Image alt={result.cover_alt_text ?? `Cancha ${result.court_name}`} fill loading={eager ? "eager" : "lazy"} sizes="(max-width: 760px) 100vw, (max-width: 1120px) 42vw, 360px" src={result.signedCoverUrl} unoptimized />
         ) : (
           <div className="search-result-placeholder" aria-label="Cancha sin fotografía">CANCHEA</div>
         )}
@@ -59,8 +53,8 @@ export function SearchResultCard({ result, eager = false }: { result: SearchResu
           <div className="search-result-price"><span>Precio total</span><strong>Bs {Number(result.price_bob).toFixed(0)}</strong></div>
         </div>
         <div className="search-result-actions">
-          <Link className="button button--secondary" href={`/complejos/${result.venue_slug}?${detailParams.toString()}`}>Ver cancha</Link>
-          <Link className="button button--primary" href={`/reservar?${bookingParams.toString()}`}>Reservar <Icon name="arrow" size={17} /></Link>
+          <Link className="button button--secondary" href={`/complejos/${result.venue_slug}`}>Ver complejo</Link>
+          <Link className="button button--primary" href={`/complejos/${result.venue_slug}?${detailParams.toString()}#disponibilidad`}>Ver horarios <Icon name="calendar" size={17} /></Link>
         </div>
       </div>
     </article>

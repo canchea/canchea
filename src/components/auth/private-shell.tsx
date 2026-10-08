@@ -6,11 +6,13 @@ export function PrivateShell({
   description,
   children,
   links = [],
+  hideHeading = false,
 }: {
   title: string;
   description: string;
   children: React.ReactNode;
   links?: { href: string; label: string }[];
+  hideHeading?: boolean;
 }) {
   return (
     <main className="private-page">
@@ -23,11 +25,13 @@ export function PrivateShell({
         </nav>
       </header>
       <div className="private-container">
-        <section className="private-heading">
-          <p className="eyebrow">Área protegida</p>
-          <h1>{title}</h1>
-          <p>{description}</p>
-        </section>
+        {!hideHeading ? (
+          <section className="private-heading">
+            <p className="eyebrow">Área protegida</p>
+            <h1>{title}</h1>
+            <p>{description}</p>
+          </section>
+        ) : null}
         {children}
       </div>
     </main>

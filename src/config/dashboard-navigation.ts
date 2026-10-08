@@ -1,5 +1,5 @@
 export const playerNavigation = [
-  { href: "/jugador", label: "Inicio" },
+  { href: "/jugador", label: "Reservar" },
   { href: "/jugador/reservas", label: "Reservas" },
   { href: "/jugador/favoritos", label: "Favoritos" },
   { href: "/jugador/valoraciones", label: "Valoraciones" },
