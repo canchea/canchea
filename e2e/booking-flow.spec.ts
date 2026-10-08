@@ -60,10 +60,10 @@ test.describe("recorrido público de reserva", () => {
     await expect(page).toHaveURL(/\/buscar\?/);
     const firstResult = page.locator(".search-result-card").first();
     await expect(firstResult).toBeVisible({ timeout: 20_000 });
-    await firstResult.getByRole("link", { name: "Ver cancha" }).click();
+    await firstResult.getByRole("link", { name: "Ver horarios" }).click();
 
     await expect(page.locator("main h1")).toBeVisible();
-    const reserveSelectedSlot = page.getByRole("link", { name: "Reservar este horario" }).first();
+    const reserveSelectedSlot = page.locator(".availability-slot").first();
     await expect(reserveSelectedSlot).toBeVisible({ timeout: 20_000 });
     await reserveSelectedSlot.click();
 
@@ -120,6 +120,18 @@ test.describe("información pública del piloto", () => {
   });
 });
 
+test.describe("@authenticated inicio del jugador", () => {
+  test.skip(!playerPassword, "Define CANCHEA_TEST_PLAYER_PASSWORD para comprobar el inicio del jugador.");
+
+  test("prioriza comenzar una reserva", async ({ page }) => {
+    await signIn(page, playerEmail, playerPassword!);
+    await expect(page).toHaveURL(/\/jugador/);
+    await expect(page.getByRole("heading", { level: 1, name: "¿Dónde quieres jugar?" })).toBeVisible();
+    await expect(page.getByRole("form", { name: "Comenzar una reserva" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Ver canchas disponibles" })).toBeVisible();
+  });
+});
+
 test.describe.serial("@authenticated reserva con pago Mock y trazabilidad por rol", () => {
   let bookingCode = "";
 
@@ -132,7 +144,10 @@ test.describe.serial("@authenticated reserva con pago Mock y trazabilidad por ro
 
     const firstResult = page.locator(".search-result-card").first();
     await expect(firstResult).toBeVisible({ timeout: 20_000 });
-    await firstResult.getByRole("link", { name: /^Reservar/ }).click();
+    await firstResult.getByRole("link", { name: "Ver horarios" }).click();
+    const firstAvailableSlot = page.locator(".availability-slot").first();
+    await expect(firstAvailableSlot).toBeVisible({ timeout: 20_000 });
+    await firstAvailableSlot.click();
     await expect(page.getByRole("heading", { name: "Revisa tu reserva" })).toBeVisible();
     await page.getByRole("button", { name: "Bloquear por 5 minutos" }).click();
 

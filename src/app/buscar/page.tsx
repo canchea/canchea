@@ -22,7 +22,7 @@ function paginationHref(filters: ReturnType<typeof normalizeSearchParams>, page:
 export default async function SearchPage({ searchParams }: { searchParams: Promise<RawSearchParams> }) {
   const filters = normalizeSearchParams(await searchParams);
   const supabase = createPublicClient();
-  const { data, error } = await supabase.rpc("search_available_courts", {
+  const searchArgs = {
     p_sport_slug: filters.sport || undefined,
     p_zone: filters.zone || undefined,
     p_date: filters.date,
@@ -35,7 +35,10 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     p_longitude: filters.longitude ?? undefined,
     p_limit: SEARCH_PAGE_SIZE,
     p_offset: (filters.page - 1) * SEARCH_PAGE_SIZE,
-  });
+  };
+  let searchResult = await supabase.rpc("search_available_courts", searchArgs);
+  if (searchResult.error) searchResult = await supabase.rpc("search_available_courts", searchArgs);
+  const { data, error } = searchResult;
   const rows = data ?? [];
   const imagePaths = rows.flatMap((row) => row.cover_object_path ? [row.cover_object_path] : []);
   const { data: signedImages } = imagePaths.length

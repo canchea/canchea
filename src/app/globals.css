@@ -2245,3 +2245,111 @@ select {
   .legal-index { position: sticky; top: 24px; }
   .policy-table [role="row"] { grid-template-columns: minmax(210px, .75fr) minmax(0, 1.25fr); }
 }
+
+/* Experiencia de reserva del jugador */
+.player-booking-hero {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(163, 230, 53, .28), transparent 30%),
+    linear-gradient(145deg, #061b14, #0f3d2e);
+  border-radius: clamp(22px, 4vw, 32px);
+  box-shadow: 0 24px 60px rgba(7, 28, 21, .2);
+  color: white;
+  overflow: hidden;
+  padding: clamp(24px, 5vw, 48px);
+  position: relative;
+}
+.player-booking-intro { max-width: 710px; position: relative; z-index: 1; }
+.player-booking-intro .eyebrow { align-items: center; color: var(--brand-accent); display: flex; gap: 7px; }
+.player-booking-intro h1 { font-size: clamp(2.4rem, 8vw, 5rem); letter-spacing: -.06em; line-height: .95; margin: 12px 0 16px; }
+.player-booking-intro > p:last-child { color: rgba(255, 255, 255, .76); font-size: 1rem; line-height: 1.55; margin: 0; max-width: 650px; }
+.player-booking-form { background: white; border-radius: 18px; display: grid; gap: 10px; margin-top: 28px; padding: 12px; position: relative; z-index: 1; }
+.player-booking-form label { display: grid; gap: 7px; }
+.player-booking-form label > span { align-items: center; color: #476057; display: flex; font-size: .72rem; font-weight: 800; gap: 6px; padding-inline: 4px; }
+.player-booking-form select { appearance: none; background: #f4f8f5; border: 1px solid #dce7df; border-radius: 12px; color: var(--brand-text); font: inherit; font-size: .8rem; font-weight: 750; min-height: 52px; outline: none; padding: 0 14px; width: 100%; }
+.player-booking-form select:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 4px rgba(34, 197, 94, .13); }
+.player-booking-form .button { min-height: 52px; width: 100%; }
+.player-booking-steps { display: grid; gap: 9px; list-style: none; margin: 22px 0 0; padding: 0; position: relative; z-index: 1; }
+.player-booking-steps li { align-items: center; color: rgba(255, 255, 255, .8); display: flex; font-size: .72rem; gap: 9px; }
+.player-booking-steps span { align-items: center; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .18); border-radius: 50%; color: var(--brand-accent); display: flex; font-size: .65rem; font-weight: 900; height: 30px; justify-content: center; width: 30px; }
+.player-discovery-section { margin: 42px 0 24px; }
+.player-discovery-section .section-heading-inline { align-items: flex-end; gap: 18px; margin-bottom: 20px; }
+.player-discovery-section h2 { font-size: clamp(1.65rem, 5vw, 2.5rem); letter-spacing: -.045em; margin: 5px 0 0; }
+.player-discovery-section .section-heading-inline > a { color: #08783e; flex: 0 0 auto; font-size: .74rem; font-weight: 850; }
+.next-booking-card { display: grid; gap: 20px; margin-top: 24px; }
+.next-booking-card h2 { font-size: clamp(1.4rem, 4vw, 2rem); letter-spacing: -.04em; margin: 5px 0 0; }
+.next-booking-content,
+.empty-action { align-items: flex-start; display: flex; flex-direction: column; gap: 15px; }
+.next-booking-content > div { display: grid; gap: 6px; }
+.next-booking-content > div:last-child { align-items: flex-start; }
+.next-booking-content span:not(.booking-status),
+.empty-action p { color: var(--brand-muted); font-size: .76rem; line-height: 1.5; margin: 0; }
+.dashboard-shortcuts { display: grid; gap: 10px; margin-top: 18px; }
+.dashboard-shortcuts > a { background: white; border: 1px solid var(--brand-border); border-radius: 15px; display: grid; gap: 5px; min-height: 90px; padding: 18px; transition: border-color 160ms ease, transform 160ms ease; }
+.dashboard-shortcuts > a:hover { border-color: var(--brand-primary); transform: translateY(-2px); }
+.dashboard-shortcuts strong { font-size: .8rem; }
+.dashboard-shortcuts span { color: var(--brand-muted); font-size: .68rem; line-height: 1.45; }
+
+/* Calendario público de una cancha */
+.court-availability-picker { background: #f5faf6; border: 1px solid #cfe4d6; border-radius: 24px; padding: clamp(20px, 4vw, 32px); scroll-margin-top: 20px; }
+.booking-flow-steps { display: grid; gap: 8px; grid-template-columns: repeat(3, minmax(0, 1fr)); list-style: none; margin: 0 0 28px; padding: 0; }
+.booking-flow-step { align-items: center; color: #84928b; display: flex; font-size: .65rem; gap: 7px; min-width: 0; }
+.booking-flow-step span { align-items: center; background: white; border: 1px solid #d5e1d9; border-radius: 50%; display: flex; flex: 0 0 auto; font-size: .62rem; height: 28px; justify-content: center; width: 28px; }
+.booking-flow-step--done,
+.booking-flow-step--active { color: var(--brand-primary-dark); }
+.booking-flow-step--done span { background: var(--brand-primary-dark); border-color: var(--brand-primary-dark); color: white; }
+.booking-flow-step--active span { background: var(--brand-primary); border-color: var(--brand-primary); color: #062416; }
+.availability-heading { align-items: flex-start; display: flex; flex-direction: column; gap: 14px; justify-content: space-between; }
+.availability-heading h2 { margin-bottom: 7px; }
+.availability-heading > div > p:last-child { color: var(--brand-muted); font-size: .78rem; margin: 0; }
+.availability-heading > a { color: #08783e; font-size: .72rem; font-weight: 850; min-height: 44px; padding-block: 10px; }
+.availability-week-nav { align-items: center; display: grid; font-size: .66rem; gap: 8px; grid-template-columns: 1fr auto 1fr; margin: 24px 0 12px; }
+.availability-week-nav a,
+.availability-week-nav > span { color: #08783e; font-weight: 800; min-height: 44px; padding: 12px 0; }
+.availability-week-nav > span { color: #9aa49f; }
+.availability-week-nav strong { font-size: .7rem; text-align: center; text-transform: capitalize; }
+.availability-week-nav a:last-child { text-align: right; }
+.availability-days { display: grid; gap: 8px; grid-auto-columns: 84px; grid-auto-flow: column; overflow-x: auto; padding: 3px 2px 10px; scrollbar-width: thin; }
+.availability-day { background: white; border: 1px solid #dce7df; border-radius: 14px; display: grid; gap: 4px; min-height: 105px; padding: 12px 9px; text-align: center; }
+.availability-day > span { color: var(--brand-muted); font-size: .64rem; font-weight: 800; text-transform: capitalize; }
+.availability-day > strong { font-size: 1.25rem; }
+.availability-day > small { color: #68766f; font-size: .58rem; line-height: 1.25; }
+.availability-day--active { background: var(--brand-primary-dark); border-color: var(--brand-primary-dark); color: white; box-shadow: 0 8px 20px rgba(7, 28, 21, .18); }
+.availability-day--active > span,
+.availability-day--active > small { color: rgba(255, 255, 255, .73); }
+.availability-slot-section { border-top: 1px solid #d6e5db; margin-top: 20px; padding-top: 22px; }
+.availability-slot-section > div:first-child h3 { font-size: 1rem; margin: 0 0 5px; }
+.availability-slot-section > div:first-child p { color: var(--brand-muted); font-size: .72rem; margin: 0 0 16px; text-transform: capitalize; }
+.availability-slots { display: grid; gap: 9px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.availability-slot { background: white; border: 1px solid #d7e3da; border-radius: 13px; display: grid; gap: 3px; min-height: 88px; padding: 13px; }
+.availability-slot:hover,
+.availability-slot--selected { border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(34, 197, 94, .12); }
+.availability-slot > strong { font-size: 1rem; }
+.availability-slot > span { color: var(--brand-muted); font-size: .64rem; }
+.availability-slot > small { color: #08783e; font-size: .66rem; font-weight: 850; }
+.availability-empty { background: white; border: 1px dashed #c9d9cf; border-radius: 14px; padding: 22px; }
+.availability-empty strong { font-size: .8rem; }
+.availability-empty p { color: var(--brand-muted); font-size: .7rem; line-height: 1.5; margin: 6px 0 0; }
+.availability-empty--error { background: #fff7f7; border-color: #f3b7b7; }
+.availability-empty--error strong { color: #9f2020; }
+#canchas { scroll-margin-top: 22px; }
+
+@media (max-width: 699px) {
+  .private-topbar { align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+  .private-topbar nav { margin-inline: -4px; overflow-x: auto; padding-inline: 4px; width: calc(100% + 8px); }
+  .private-topbar nav a,
+  .private-topbar nav button { flex: 0 0 auto; white-space: nowrap; }
+  .private-container { padding-top: 28px; }
+}
+
+@media (min-width: 700px) {
+  .player-booking-form { align-items: end; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(210px, .72fr); }
+  .player-booking-steps { grid-template-columns: repeat(3, auto); justify-content: start; }
+  .next-booking-card { align-items: center; grid-template-columns: minmax(0, 1fr) minmax(280px, .8fr); }
+  .next-booking-content,
+  .empty-action { align-items: center; flex-direction: row; justify-content: space-between; }
+  .next-booking-content > div:last-child { align-items: center; grid-auto-flow: column; }
+  .dashboard-shortcuts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .availability-heading { align-items: center; flex-direction: row; }
+  .availability-days { grid-auto-columns: minmax(84px, 1fr); }
+  .availability-slots { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
