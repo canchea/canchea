@@ -64,8 +64,8 @@ export default function Home() {
 
         <div id="explorar" className="venue-sections">
           <div className="container demo-note" role="note">
-            <span>Vista de diseño</span>
-            <p>Estas tarjetas siguen siendo una muestra visual. El buscador superior ya consulta disponibilidad y precios reales.</p>
+            <span>Piloto controlado</span>
+            <p>Estas tarjetas presentan la experiencia inicial. El buscador superior consulta disponibilidad y precios reales.</p>
           </div>
           {homeSections.map((section) => (
             <section className="venue-section" id={section.id} key={section.id} aria-labelledby={`${section.id}-title`}>

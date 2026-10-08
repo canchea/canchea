@@ -90,6 +90,34 @@ test.describe("información pública del piloto", () => {
       await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
     });
   }
+
+  test("publica una configuración instalable para teléfonos", async ({ page, request }) => {
+    const manifestResponse = await request.get("/manifest.webmanifest");
+    expect(manifestResponse.ok()).toBeTruthy();
+
+    const manifest = await manifestResponse.json();
+    expect(manifest).toMatchObject({
+      name: "CANCHEA — Reserva canchas",
+      short_name: "CANCHEA",
+      display: "standalone",
+      start_url: "/",
+      theme_color: "#0f3d2e",
+    });
+    expect(manifest.icons).toEqual(expect.arrayContaining([
+      expect.objectContaining({ src: "/icon-192.png", sizes: "192x192" }),
+      expect.objectContaining({ src: "/icon-512.png", sizes: "512x512" }),
+    ]));
+
+    for (const iconPath of ["/icon-192.png", "/icon-512.png", "/apple-touch-icon.png"]) {
+      const iconResponse = await request.get(iconPath);
+      expect(iconResponse.ok()).toBeTruthy();
+      expect(iconResponse.headers()["content-type"]).toContain("image/png");
+    }
+
+    await page.goto("/");
+    await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("href", "/manifest.webmanifest");
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#0f3d2e");
+  });
 });
 
 test.describe.serial("@authenticated reserva con pago Mock y trazabilidad por rol", () => {
