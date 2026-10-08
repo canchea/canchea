@@ -14,10 +14,15 @@ export function PrivateShell({
   links?: { href: string; label: string }[];
   hideHeading?: boolean;
 }) {
+  const primaryLink = links[0];
+
   return (
     <main className="private-page">
       <header className="private-topbar">
-        <Logo />
+        <Logo
+          href={primaryLink?.href ?? "/"}
+          navigationLabel={primaryLink ? `ir a ${primaryLink.label}` : "ir al inicio"}
+        />
         <nav aria-label="Cuenta">
           {links.map((link) => <Link href={link.href} key={link.href}>{link.label}</Link>)}
           <Link href="/cuenta">Mi perfil</Link>
