@@ -33,7 +33,7 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
 
   if (!account) redirect(`/auth/iniciar-sesion?continuar=${encodeURIComponent(returnPath)}`);
   if (account.profile?.role !== "player") redirect("/cuenta");
-  if (!validUuid(courtId) || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time) || ![30, 60].includes(duration)) {
+  if (!validUuid(courtId) || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^(?:[01]\d|2[0-3]):00$/.test(time) || duration !== 60) {
     redirect("/buscar?estado=reserva-invalida");
   }
 
@@ -80,14 +80,14 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
           <dl className="booking-summary-list">
             <div><dt>Fecha</dt><dd>{date}</dd></div>
             <div><dt>Hora</dt><dd>{time}</dd></div>
-            <div><dt>Duración</dt><dd>{duration} min</dd></div>
+            <div><dt>Duración</dt><dd>1 hora</dd></div>
             <div><dt>Zona</dt><dd>{venue?.zone}</dd></div>
             <div><dt>Superficie</dt><dd>{court.court_surfaces?.name}</dd></div>
           </dl>
         </section>
         <aside className="private-card booking-price-card">
           <p className="eyebrow">Resumen de pago</p>
-          <div><span>Precio de la cancha</span><strong>Bs {formatBob(price)}</strong></div>
+          <div><span>Precio por 1 hora</span><strong>Bs {formatBob(price)}</strong></div>
           <div><span>Seña requerida</span><strong>Bs {formatBob(deposit)}</strong></div>
           <div><span>Saldo en el complejo</span><strong>Bs {formatBob(price - deposit)}</strong></div>
           <p>Pagarás la seña en el siguiente paso. El saldo se paga directamente en el complejo.</p>

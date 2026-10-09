@@ -58,11 +58,10 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
     );
   }
 
-  const [{ data: schedule }, { data: pricingRules }, { data: blocks }, { data: durations }] = await Promise.all([
+  const [{ data: schedule }, { data: pricingRules }, { data: blocks }] = await Promise.all([
     supabase.from("court_weekly_schedules").select("*").eq("court_id", selectedCourt.id).order("day_of_week"),
     supabase.from("court_pricing_rules").select("*").eq("court_id", selectedCourt.id).eq("is_active", true).order("day_of_week").order("starts_minute"),
     supabase.from("court_blocks").select("*").eq("court_id", selectedCourt.id).gte("ends_at", new Date().toISOString()).order("starts_at"),
-    supabase.from("court_durations").select("duration_minutes").eq("court_id", selectedCourt.id).order("duration_minutes"),
   ]);
 
   const today = dateInTimeZone(venue.timezone);
@@ -76,8 +75,6 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
     date,
     slots: (previewSlots ?? []).filter((slot) => slot.slot_date === date),
   }));
-  const enabledDurations = (durations ?? []).map((entry) => entry.duration_minutes);
-
   return (
     <PrivateShell links={shellLinks} title="Horarios y precios" description={`Configura la operación de ${venue.commercial_name} sin crear reservas manuales.`}><VenueSwitcher activeVenueId={activeVenueId} returnTo="/propietario/disponibilidad" venues={ownerVenues} />
       <section className="court-selector" aria-label="Seleccionar cancha">
@@ -91,18 +88,18 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
       </section>
 
       <section className="private-card availability-section">
-        <div className="section-heading"><span>01</span><div><h2>Horario semanal</h2><p>Debe estar dentro del horario general del complejo y usar intervalos de 30 minutos.</p></div></div>
+        <div className="section-heading"><span>01</span><div><h2>Horario semanal</h2><p>Indica desde qué hora hasta qué hora funciona la cancha. Usa horas completas.</p></div></div>
         <WeeklyScheduleForm courtId={selectedCourt.id} schedule={schedule ?? []} />
       </section>
 
       <section className="private-card availability-section">
-        <div className="section-heading"><span>02</span><div><h2>Reglas de precio</h2><p>Define un precio por día, franja y duración. Las reglas del mismo tipo no pueden superponerse.</p></div></div>
-        <PricingRuleForm courtId={selectedCourt.id} durations={enabledDurations} />
+        <div className="section-heading"><span>02</span><div><h2>Precios por hora</h2><p>Define cuánto cuesta una hora en cada día y franja. Las franjas no pueden superponerse.</p></div></div>
+        <PricingRuleForm courtId={selectedCourt.id} />
         <div className="pricing-rule-list">
           {(pricingRules ?? []).length ? (pricingRules ?? []).map((rule) => (
             <article key={rule.id}>
               <div><strong>{dayNames[rule.day_of_week]}</strong><span>{minuteToTime(rule.starts_minute)} – {minuteToTime(rule.ends_minute)}</span></div>
-              <div><strong>Bs {rule.price_bob}</strong><span>{rule.duration_minutes} minutos</span></div>
+              <div><strong>Bs {rule.price_bob}</strong><span>por hora</span></div>
               <form action={deletePricingRuleAction}><input name="rule_id" type="hidden" value={rule.id} /><ConfirmSubmitButton message="¿Eliminar esta regla de precio? Los horarios que dependan de ella dejarán de estar disponibles.">Eliminar</ConfirmSubmitButton></form>
             </article>
           )) : <div className="inline-empty"><strong>Sin precios configurados</strong><p>Los horarios no aparecerán disponibles hasta que agregues reglas de precio.</p></div>}
@@ -130,7 +127,7 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
           {previewResults.map(({ date, slots }) => (
             <article key={date}>
               <time dateTime={date}>{new Intl.DateTimeFormat("es-BO", { weekday: "short", day: "2-digit", month: "short", timeZone: "UTC" }).format(new Date(`${date}T12:00:00Z`))}</time>
-              {slots.length ? <div>{slots.slice(0, 8).map((slot) => <span key={`${slot.starts_at}-${slot.duration_minutes}`}>{slot.start_time.slice(0, 5)} · {slot.duration_minutes} min · Bs {slot.price_bob}</span>)}{slots.length > 8 && <small>+{slots.length - 8} opciones</small>}</div> : <p>Sin horarios</p>}
+              {slots.length ? <div>{slots.slice(0, 8).map((slot) => <span key={`${slot.starts_at}-${slot.duration_minutes}`}>{slot.start_time.slice(0, 5)} · 1 hora · Bs {slot.price_bob}</span>)}{slots.length > 8 && <small>+{slots.length - 8} opciones</small>}</div> : <p>Sin horarios</p>}
             </article>
           ))}
         </div>

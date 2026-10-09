@@ -48,7 +48,7 @@ export async function SearchPanel({ defaults, showAdvanced = false }: SearchPane
           <span className="field-icon"><Icon name="clock" /></span>
           <span className="field-copy">
             <span className="field-label">Hora</span>
-            <input aria-label="Hora de la reserva" defaultValue={defaults?.time ?? "20:00"} name="hora" step="1800" type="time" />
+            <input aria-label="Hora de la reserva" defaultValue={defaults?.time ?? "20:00"} name="hora" step="3600" type="time" />
           </span>
         </label>
       </div>
@@ -61,14 +61,6 @@ export async function SearchPanel({ defaults, showAdvanced = false }: SearchPane
           <label>
             <span>Precio máximo</span>
             <input defaultValue={defaults?.maxPrice ?? ""} min="0" name="precio_max" placeholder="Sin límite" step="10" type="number" />
-          </label>
-          <label>
-            <span>Duración</span>
-            <select defaultValue={defaults?.duration ?? ""} name="duracion">
-              <option value="">Cualquier duración</option>
-              <option value="30">30 minutos</option>
-              <option value="60">60 minutos</option>
-            </select>
           </label>
           <label>
             <span>Ordenar</span>

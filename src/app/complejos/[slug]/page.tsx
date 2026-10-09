@@ -13,6 +13,21 @@ import type { CourtPhoto } from "@/types/database";
 
 const dayNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
+const availabilityPeriods = [
+  { label: "Mañana", description: "Antes de las 12:00", startsAt: 0, endsAt: 12 },
+  { label: "Tarde", description: "De 12:00 a 17:59", startsAt: 12, endsAt: 18 },
+  { label: "Noche", description: "Desde las 18:00", startsAt: 18, endsAt: 24 },
+] as const;
+
+function hourRange(value: string) {
+  const hour = Number(value.slice(0, 2));
+  const minute = Number(value.slice(3, 5));
+  const endMinutes = (hour * 60 + minute + 60) % 1440;
+  const start = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  const end = `${String(Math.floor(endMinutes / 60)).padStart(2, "0")}:${String(endMinutes % 60).padStart(2, "0")}`;
+  return `${start} – ${end}`;
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const supabase = createPublicClient();
@@ -62,7 +77,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
     supabase.from("venue_photos").select("*").eq("venue_id", venue.id).order("kind").order("sort_order"),
     supabase.from("venue_opening_hours").select("*").eq("venue_id", venue.id).order("day_of_week"),
     supabase.from("venue_services").select("service_id").eq("venue_id", venue.id),
-    supabase.from("courts").select("*, sports(name), sport_modalities(name), court_surfaces(name), court_durations(duration_minutes), court_feature_assignments(feature_id, court_features(name))").eq("venue_id", venue.id).eq("status", "active").order("created_at"),
+    supabase.from("courts").select("*, sports(name), sport_modalities(name), court_surfaces(name), court_feature_assignments(feature_id, court_features(name))").eq("venue_id", venue.id).eq("status", "active").order("created_at"),
     supabase.from("reviews").select("id, rating, comment, created_at, courts(name)").eq("venue_id", venue.id).order("created_at", { ascending: false }).limit(20),
   ]);
   const serviceIds = (links ?? []).map((link) => link.service_id);
@@ -101,7 +116,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
   }));
   const today = dateInTimeZone(venue.timezone);
   const validFutureDate = (value?: string) => /^\d{4}-\d{2}-\d{2}$/.test(value ?? "") && value! >= today;
-  const requestedTime = /^(?:[01]\d|2[0-3]):(?:00|30)$/.test(requested.hora ?? "") ? requested.hora : null;
+  const requestedTime = /^(?:[01]\d|2[0-3]):00$/.test(requested.hora ?? "") ? requested.hora : null;
   const requestedCourtId = /^[0-9a-f-]{36}$/i.test(requested.cancha ?? "") ? requested.cancha : null;
   const selectedCourt = courtRows.find((court) => court.id === requestedCourtId) ?? null;
   const requestedCalendarStart = validFutureDate(requested.desde ?? requested.fecha) ? (requested.desde ?? requested.fecha)! : today;
@@ -127,6 +142,13 @@ export default async function VenueDetailPage({ params, searchParams }: { params
   const selectedAvailability = selectedCourt ? availabilityByCourt.get(selectedCourt.id) ?? [] : [];
   const selectedAvailabilityError = selectedCourt ? availabilityErrorByCourt.get(selectedCourt.id) ?? false : false;
   const selectedDaySlots = selectedAvailability.filter((slot) => slot.slot_date === requestedDate);
+  const selectedSlotsByPeriod = availabilityPeriods.map((period) => ({
+    ...period,
+    slots: selectedDaySlots.filter((slot) => {
+      const hour = Number(slot.start_time.slice(0, 2));
+      return hour >= period.startsAt && hour < period.endsAt;
+    }),
+  })).filter((period) => period.slots.length > 0);
   const availabilityCountByDate = new Map(calendarDays.map((date) => [
     date,
     selectedAvailability.filter((slot) => slot.slot_date === date).length,
@@ -193,7 +215,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
                   <div>
                     <p className="eyebrow">Cancha seleccionada</p>
                     <h2 id="availability-title">Elige cuándo jugar</h2>
-                    <p>{selectedCourt.name} · {selectedCourt.sports.name} · {selectedCourt.sport_modalities.name}</p>
+                    <p>{selectedCourt.name} · {selectedCourt.sports.name} · {selectedCourt.sport_modalities.name} · Reservas de 1 hora</p>
                   </div>
                   <Link href="#canchas">Cambiar cancha</Link>
                 </div>
@@ -218,7 +240,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
                       >
                         <span>{new Intl.DateTimeFormat("es-BO", { weekday: "short", timeZone: "UTC" }).format(parsedDate)}</span>
                         <strong>{new Intl.DateTimeFormat("es-BO", { day: "numeric", timeZone: "UTC" }).format(parsedDate)}</strong>
-                        <small>{count ? `${count} opciones` : "Sin horarios"}</small>
+                        <small>{count ? `${count} ${count === 1 ? "hora" : "horas"}` : "Sin horarios"}</small>
                       </Link>
                     );
                   })}
@@ -227,6 +249,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
                   <div>
                     <h3>Horarios disponibles</h3>
                     <p>{new Intl.DateTimeFormat("es-BO", { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${requestedDate}T12:00:00Z`))}</p>
+                    <small className="availability-instruction">Elige una hora. Cada reserva dura exactamente 60 minutos.</small>
                   </div>
                   {selectedAvailabilityError ? (
                     <div className="availability-empty availability-empty--error" role="alert">
@@ -234,28 +257,38 @@ export default async function VenueDetailPage({ params, searchParams }: { params
                       <p>Actualiza la pantalla en unos segundos. No se ha creado ninguna reserva.</p>
                     </div>
                   ) : selectedDaySlots.length ? (
-                    <div className="availability-slots">
-                      {selectedDaySlots.map((slot) => {
-                        const time = slot.start_time.slice(0, 5);
-                        const reservationParams = new URLSearchParams({
-                          cancha: selectedCourt.id,
-                          fecha: slot.slot_date,
-                          hora: time,
-                          duracion: String(slot.duration_minutes),
-                        });
-                        return (
-                          <Link
-                            aria-label={`Reservar el ${slot.slot_date} a las ${time} por ${slot.duration_minutes} minutos`}
-                            className={requestedTime === time ? "availability-slot availability-slot--selected" : "availability-slot"}
-                            href={`/reservar?${reservationParams.toString()}`}
-                            key={`${slot.starts_at}-${slot.duration_minutes}`}
-                          >
-                            <strong>{time}</strong>
-                            <span>{slot.duration_minutes} min</span>
-                            <small>Bs {Number(slot.price_bob).toFixed(0)}</small>
-                          </Link>
-                        );
-                      })}
+                    <div className="availability-periods">
+                      {selectedSlotsByPeriod.map((period) => (
+                        <section className="availability-period" key={period.label} aria-labelledby={`period-${period.startsAt}`}>
+                          <div className="availability-period-heading">
+                            <h4 id={`period-${period.startsAt}`}>{period.label}</h4>
+                            <span>{period.description}</span>
+                          </div>
+                          <div className="availability-slots">
+                            {period.slots.map((slot) => {
+                              const time = slot.start_time.slice(0, 5);
+                              const reservationParams = new URLSearchParams({
+                                cancha: selectedCourt.id,
+                                fecha: slot.slot_date,
+                                hora: time,
+                                duracion: "60",
+                              });
+                              return (
+                                <Link
+                                  aria-label={`Reservar el ${slot.slot_date} de ${hourRange(time)} por Bs ${Number(slot.price_bob).toFixed(0)}`}
+                                  className={requestedTime === time ? "availability-slot availability-slot--selected" : "availability-slot"}
+                                  href={`/reservar?${reservationParams.toString()}`}
+                                  key={slot.starts_at}
+                                >
+                                  <strong>{hourRange(time)}</strong>
+                                  <span>1 hora</span>
+                                  <small>Bs {Number(slot.price_bob).toFixed(0)}</small>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </section>
+                      ))}
                     </div>
                   ) : (
                     <div className="availability-empty">
@@ -275,7 +308,6 @@ export default async function VenueDetailPage({ params, searchParams }: { params
                 <div className="public-court-grid">
                   {courtRows.map((court) => {
                     const cover = courtCoverById.get(court.id);
-                    const durations = court.court_durations.map((entry) => entry.duration_minutes).sort((a, b) => a - b);
                     const features = court.court_feature_assignments.flatMap((entry) => entry.court_features ? [entry.court_features.name] : []);
                     const availability = availabilityByCourt.get(court.id) ?? [];
                     const availabilityError = availabilityErrorByCourt.get(court.id) ?? false;
@@ -293,7 +325,7 @@ export default async function VenueDetailPage({ params, searchParams }: { params
                           <div className="public-court-tags"><span>{court.court_surfaces.name}</span><span>{court.capacity} jugadores</span><span>{court.length_m} × {court.width_m} m</span>{court.is_roofed && <span>Techada</span>}{court.has_lighting && <span>Iluminación</span>}{features.map((feature) => <span key={feature}>{feature}</span>)}</div>
                           <footer>
                             <strong>{availabilityError ? "Disponibilidad temporalmente no disponible" : minimumPrice === null ? "Sin precio disponible" : `Desde Bs ${minimumPrice}`}</strong>
-                            <span>{availabilityError ? "Vuelve a intentarlo en unos segundos" : nextSlot ? `Próximo: ${nextSlot.slot_date === today ? "hoy" : nextSlot.slot_date === tomorrow ? "mañana" : nextSlot.slot_date} a las ${nextSlot.start_time.slice(0, 5)} · ${nextSlot.duration_minutes} min` : `Sin horarios en las próximas 48 h · ${durations.join(" o ")} min`}</span>
+                            <span>{availabilityError ? "Vuelve a intentarlo en unos segundos" : nextSlot ? `Próximo: ${nextSlot.slot_date === today ? "hoy" : nextSlot.slot_date === tomorrow ? "mañana" : nextSlot.slot_date} de ${hourRange(nextSlot.start_time)} · 1 hora` : "Sin horarios en las próximas 48 h · Reservas de 1 hora"}</span>
                           </footer>
                           <Link className="button button--primary selected-court-booking" href={court.id === selectedCourt?.id ? "#disponibilidad" : calendarHref}>
                             {court.id === selectedCourt?.id ? "Ver calendario y horarios" : "Elegir esta cancha"}

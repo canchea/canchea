@@ -48,9 +48,9 @@ export function SearchResultCard({ result, eager = false }: { result: SearchResu
         <div className="search-result-slot">
           <div>
             <span>Horario disponible</span>
-            <strong>{formatTime(result.start_time)} · {result.duration_minutes} min</strong>
+            <strong>{formatTime(result.start_time)} · 1 hora</strong>
           </div>
-          <div className="search-result-price"><span>Precio total</span><strong>Bs {Number(result.price_bob).toFixed(0)}</strong></div>
+          <div className="search-result-price"><span>Precio por hora</span><strong>Bs {Number(result.price_bob).toFixed(0)}</strong></div>
         </div>
         <div className="search-result-actions">
           <Link className="button button--secondary" href={`/complejos/${result.venue_slug}`}>Ver complejo</Link>

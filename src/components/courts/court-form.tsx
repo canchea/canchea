@@ -17,7 +17,6 @@ export function CourtForm({
   modalities,
   surfaces,
   features,
-  selectedDurations,
   selectedFeatureIds,
 }: {
   court: Court | null;
@@ -25,7 +24,6 @@ export function CourtForm({
   modalities: Modality[];
   surfaces: Surface[];
   features: Feature[];
-  selectedDurations: number[];
   selectedFeatureIds: number[];
 }) {
   const [state, action] = useActionState(saveCourtAction, initialFormState);
@@ -109,18 +107,10 @@ export function CourtForm({
         </div>
       </fieldset>
 
-      <fieldset className="court-options">
-        <legend>Duraciones que aceptará</legend>
-        <p>Podrás asignar horarios y precios distintos a cada duración en la Fase 5.</p>
-        <div className="court-binary-grid">
-          {[30, 60].map((duration) => (
-            <label className="court-option" key={duration}>
-              <input defaultChecked={selectedDurations.includes(duration) || (!court && duration === 60)} name="durations" type="checkbox" value={duration} />
-              <span aria-hidden="true">✓</span><strong>{duration} minutos</strong>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <div className="hourly-booking-note" role="note">
+        <strong>Reservas simples de 1 hora</strong>
+        <p>Esta cancha se ofrecerá automáticamente en bloques de una hora. Sólo necesitas definir el horario semanal y el precio por hora.</p>
+      </div>
 
       <fieldset className="court-options">
         <legend>Características adicionales</legend>
