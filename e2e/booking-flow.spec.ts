@@ -65,6 +65,8 @@ test.describe("recorrido público de reserva", () => {
     await expect(page.locator("main h1")).toBeVisible();
     const reserveSelectedSlot = page.locator(".availability-slot").first();
     await expect(reserveSelectedSlot).toBeVisible({ timeout: 20_000 });
+    await expect(reserveSelectedSlot).toContainText("1 hora");
+    await expect(reserveSelectedSlot).toHaveAttribute("href", /duracion=60/);
     await reserveSelectedSlot.click();
 
     await expect(page).toHaveURL(/\/auth\/iniciar-sesion\?continuar=/);

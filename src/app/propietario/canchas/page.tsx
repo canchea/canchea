@@ -76,7 +76,6 @@ export default async function CourtsPage({
   const modalityById = new Map((modalities ?? []).map((modality) => [modality.id, modality]));
   const surfaceById = new Map((surfaces ?? []).map((surface) => [surface.id, surface]));
   const editingCourt = query.editar ? courtRows.find((court) => court.id === query.editar) ?? null : null;
-  const selectedDurations = (durations ?? []).filter((entry) => entry.court_id === editingCourt?.id).map((entry) => entry.duration_minutes);
   const selectedFeatureIds = (assignments ?? []).filter((entry) => entry.court_id === editingCourt?.id).map((entry) => entry.feature_id);
   const editingPhotos = photos.filter((photo) => photo.court_id === editingCourt?.id);
 
@@ -89,7 +88,7 @@ export default async function CourtsPage({
       {query.guardado === "1" && <div className="page-notice page-notice--success">La cancha se guardó correctamente. Agrega una portada para poder activarla.</div>}
       {query.estado === "activada" && <div className="page-notice page-notice--success">La cancha está activa y ya aparece en la ficha pública.</div>}
       {query.estado === "pausada" && <div className="page-notice page-notice--success">La cancha quedó pausada y ya no es visible públicamente.</div>}
-      {query.estado === "error" && <div className="page-notice page-notice--error">Para activar una cancha necesitas al menos una duración y una foto de portada.</div>}
+      {query.estado === "error" && <div className="page-notice page-notice--error">Para activar una cancha necesitas tener habilitadas las reservas por hora y una foto de portada.</div>}
 
       <section className="court-overview">
         <div><p className="eyebrow">Fase 4</p><h2>{courtRows.length ? `${courtRows.length} ${courtRows.length === 1 ? "cancha registrada" : "canchas registradas"}` : "Registra tu primera cancha"}</h2><p>Las canchas activas se muestran en la página pública del complejo.</p></div>
@@ -137,7 +136,6 @@ export default async function CourtsPage({
           features={features ?? []}
           key={editingCourt?.id ?? "new"}
           modalities={modalities ?? []}
-          selectedDurations={selectedDurations}
           selectedFeatureIds={selectedFeatureIds}
           sports={sports ?? []}
           surfaces={surfaces ?? []}

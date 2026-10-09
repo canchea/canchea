@@ -39,8 +39,14 @@ export async function saveWeeklyScheduleAction(_state: FormState, formData: Form
   if (schedule.every((entry) => !entry.is_available)) {
     return { status: "error", message: "Marca al menos un día disponible." };
   }
-  if (schedule.some((entry) => entry.is_available && (entry.opens_minute === null || entry.closes_minute === null || entry.opens_minute >= entry.closes_minute))) {
-    return { status: "error", message: "Usa horas válidas en intervalos de 30 minutos." };
+  if (schedule.some((entry) => entry.is_available && (
+    entry.opens_minute === null
+    || entry.closes_minute === null
+    || entry.opens_minute >= entry.closes_minute
+    || entry.opens_minute % 60 !== 0
+    || entry.closes_minute % 60 !== 0
+  ))) {
+    return { status: "error", message: "Usa horas completas, por ejemplo 07:00 a 23:00." };
   }
 
   const supabase = await createClient();
@@ -68,14 +74,13 @@ export async function createPricingRuleAction(_state: FormState, formData: FormD
   const day = integer(text(formData, "day_of_week"), 0, 6);
   const startsMinute = timeToMinute(text(formData, "starts_at"));
   const endsMinute = timeToMinute(text(formData, "ends_at"));
-  const duration = integer(text(formData, "duration_minutes"), 30, 60);
   const price = Number(text(formData, "price_bob").replace(",", "."));
 
-  if (!courtId || day === null || startsMinute === null || endsMinute === null || startsMinute >= endsMinute) {
-    return { status: "error", message: "Completa correctamente el día y la franja horaria." };
+  if (!courtId || day === null || startsMinute === null || endsMinute === null || startsMinute >= endsMinute || startsMinute % 60 !== 0 || endsMinute % 60 !== 0) {
+    return { status: "error", message: "Completa el día y una franja usando horas completas." };
   }
-  if ((duration !== 30 && duration !== 60) || !Number.isFinite(price) || price <= 0 || price > 100000) {
-    return { status: "error", message: "Ingresa una duración habilitada y un precio válido." };
+  if (!Number.isFinite(price) || price <= 0 || price > 100000) {
+    return { status: "error", message: "Ingresa un precio por hora válido." };
   }
 
   const supabase = await createClient();
@@ -84,23 +89,21 @@ export async function createPricingRuleAction(_state: FormState, formData: FormD
     p_day_of_week: day,
     p_starts_minute: startsMinute,
     p_ends_minute: endsMinute,
-    p_duration_minutes: duration,
+    p_duration_minutes: 60,
     p_price_bob: price,
   });
 
   if (error) {
     const message = error.message.includes("overlaps")
-      ? "La regla se superpone con otra del mismo día y duración. Divide las franjas sin cruces."
+      ? "La regla se superpone con otra del mismo día. Divide las franjas sin cruces."
       : error.message.includes("court schedule")
         ? "La franja debe estar completamente dentro del horario configurado para ese día."
-        : error.message.includes("not enabled")
-          ? "Esta duración no está habilitada en la cancha."
-          : "No pudimos crear la regla de precio.";
+        : "No pudimos crear la regla de precio.";
     return { status: "error", message };
   }
 
   revalidateAvailability();
-  return { status: "success", message: "Regla de precio creada." };
+  return { status: "success", message: "Precio por hora creado." };
 }
 
 export async function deletePricingRuleAction(formData: FormData) {

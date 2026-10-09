@@ -24,8 +24,8 @@ export function WeeklyScheduleForm({ courtId, schedule }: { courtId: string; sch
             <div className="availability-day" key={dayName}>
               <strong>{dayName}</strong>
               <label className="availability-toggle"><input defaultChecked={available} name={`available_${day}`} type="checkbox" /><span>Disponible</span></label>
-              <label><span>Desde</span><input defaultValue={entry?.opens_minute == null ? "07:00" : minuteToTime(entry.opens_minute)} name={`opens_${day}`} step="1800" type="time" /></label>
-              <label><span>Hasta</span><input defaultValue={entry?.closes_minute == null ? "23:00" : minuteToTime(entry.closes_minute)} name={`closes_${day}`} step="1800" type="time" /></label>
+              <label><span>Desde</span><input defaultValue={entry?.opens_minute == null ? "07:00" : minuteToTime(entry.opens_minute)} name={`opens_${day}`} step="3600" type="time" /></label>
+              <label><span>Hasta</span><input defaultValue={entry?.closes_minute == null ? "23:00" : minuteToTime(entry.closes_minute)} name={`closes_${day}`} step="3600" type="time" /></label>
             </div>
           );
         })}

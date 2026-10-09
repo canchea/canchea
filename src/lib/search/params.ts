@@ -19,7 +19,6 @@ export type SearchFilters = {
   time: string;
   minPrice: number | null;
   maxPrice: number | null;
-  duration: 30 | 60 | null;
   sort: SearchSort;
   latitude: number | null;
   longitude: number | null;
@@ -53,9 +52,7 @@ export function normalizeSearchParams(raw: RawSearchParams): SearchFilters {
   const rawDate = first(raw.fecha);
   const date = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) && rawDate >= today ? rawDate : today;
   const rawTime = first(raw.hora);
-  const time = /^(?:[01]\d|2[0-3]):(?:00|30)$/.test(rawTime) ? rawTime : "";
-  const durationValue = Number(first(raw.duracion));
-  const duration = durationValue === 30 || durationValue === 60 ? durationValue : null;
+  const time = /^(?:[01]\d|2[0-3]):00$/.test(rawTime) ? rawTime : "";
   const minPrice = numberInRange(first(raw.precio_min), 0, 100000);
   const maxPrice = numberInRange(first(raw.precio_max), 0, 100000);
   const latitude = numberInRange(first(raw.lat), -90, 90);
@@ -76,7 +73,6 @@ export function normalizeSearchParams(raw: RawSearchParams): SearchFilters {
     time,
     minPrice,
     maxPrice: minPrice !== null && maxPrice !== null && maxPrice < minPrice ? null : maxPrice,
-    duration,
     sort,
     latitude: hasCoordinates ? latitude : null,
     longitude: hasCoordinates ? longitude : null,
@@ -92,7 +88,6 @@ export function filtersToSearchParams(filters: SearchFilters) {
   if (filters.time) params.set("hora", filters.time);
   if (filters.minPrice !== null) params.set("precio_min", String(filters.minPrice));
   if (filters.maxPrice !== null) params.set("precio_max", String(filters.maxPrice));
-  if (filters.duration !== null) params.set("duracion", String(filters.duration));
   if (filters.sort !== "recommended") params.set("orden", filters.sort);
   if (filters.latitude !== null && filters.longitude !== null) {
     params.set("lat", String(filters.latitude));

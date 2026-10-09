@@ -33,14 +33,12 @@ export async function saveCourtAction(_state: FormState, formData: FormData): Pr
   const capacity = parseNumber(text(formData, "capacity"), 1, 100);
   const length = parseNumber(text(formData, "length_m"), 3, 200);
   const width = parseNumber(text(formData, "width_m"), 2, 150);
-  const durations = formData.getAll("durations").map(Number).filter((value) => value === 30 || value === 60);
   const featureSlugs = formData.getAll("features").map(String);
 
   if (name.length < 3) return { status: "error", message: "El nombre de la cancha debe tener al menos 3 caracteres." };
   if (!sportSlug || !modalitySlug || !surfaceSlug) return { status: "error", message: "Selecciona deporte, modalidad y superficie." };
   if (capacity === null || !Number.isInteger(capacity)) return { status: "error", message: "Ingresa una capacidad válida entre 1 y 100 jugadores." };
   if (length === null || width === null) return { status: "error", message: "Ingresa dimensiones válidas para la cancha." };
-  if (!durations.length) return { status: "error", message: "Selecciona al menos una duración: 30 o 60 minutos." };
 
   const supabase = await createClient();
   const { data: court, error } = await supabase.rpc("save_my_court", {
@@ -55,7 +53,7 @@ export async function saveCourtAction(_state: FormState, formData: FormData): Pr
     p_width_m: width,
     p_is_roofed: formData.get("is_roofed") === "on",
     p_has_lighting: formData.get("has_lighting") === "on",
-    p_duration_minutes: [...new Set(durations)],
+    p_duration_minutes: [60],
     p_feature_slugs: [...new Set(featureSlugs)],
   });
 

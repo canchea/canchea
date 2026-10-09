@@ -29,7 +29,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     p_time: filters.time || undefined,
     p_min_price_bob: filters.minPrice ?? undefined,
     p_max_price_bob: filters.maxPrice ?? undefined,
-    p_duration_minutes: filters.duration ?? undefined,
+    p_duration_minutes: 60,
     p_sort: filters.sort,
     p_latitude: filters.latitude ?? undefined,
     p_longitude: filters.longitude ?? undefined,

@@ -23,7 +23,7 @@ export async function createBookingHoldAction(formData: FormData) {
   const duration = Number(value(formData, "duration_minutes"));
   const returnPath = value(formData, "return_path");
 
-  if (!validUuid(courtId) || !Number.isFinite(Date.parse(startsAt)) || ![30, 60].includes(duration)) {
+  if (!validUuid(courtId) || !Number.isFinite(Date.parse(startsAt)) || duration !== 60) {
     redirect("/buscar?estado=reserva-invalida");
   }
 
