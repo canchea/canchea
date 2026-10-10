@@ -41,13 +41,40 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const { data, error } = searchResult;
   const rows = data ?? [];
   const imagePaths = rows.flatMap((row) => row.cover_object_path ? [row.cover_object_path] : []);
-  const { data: signedImages } = imagePaths.length
-    ? await supabase.storage.from("venue-media").createSignedUrls(imagePaths, 3600)
-    : { data: [] };
+  const courtIds = [...new Set(rows.map((row) => row.court_id))];
+  const [signedImagesResult, ratingsResult, availabilityResults] = await Promise.all([
+    imagePaths.length
+      ? supabase.storage.from("venue-media").createSignedUrls(imagePaths, 3600)
+      : Promise.resolve({ data: [] }),
+    courtIds.length
+      ? supabase.from("courts").select("id, rating_average, review_count").in("id", courtIds)
+      : Promise.resolve({ data: [] }),
+    Promise.all(courtIds.map((courtId) => supabase.rpc("get_court_availability_range", {
+      p_court_id: courtId,
+      p_start_date: filters.date,
+      p_days: 1,
+    }))),
+  ]);
+  const signedImages = signedImagesResult.data ?? [];
   const signedByPath = new Map((signedImages ?? []).map((image) => [image.path, image.signedUrl]));
+  const ratingByCourt = new Map((ratingsResult.data ?? []).map((court) => [court.id, court]));
+  const availabilityByCourt = new Map(courtIds.map((courtId, index) => [
+    courtId,
+    availabilityResults[index]?.data ?? [],
+  ]));
   const results: SearchResultWithImage[] = rows.map((row) => ({
     ...row,
     signedCoverUrl: row.cover_object_path ? signedByPath.get(row.cover_object_path) ?? null : null,
+    ratingAverage: Number(ratingByCourt.get(row.court_id)?.rating_average ?? 0) || null,
+    reviewCount: Number(ratingByCourt.get(row.court_id)?.review_count ?? 0),
+    nextSlots: (availabilityByCourt.get(row.court_id) ?? [])
+      .filter((slot) => !filters.time || slot.start_time.slice(0, 5) >= filters.time)
+      .slice(0, 3)
+      .map((slot) => ({
+        slotDate: slot.slot_date,
+        startTime: slot.start_time,
+        priceBob: Number(slot.price_bob),
+      })),
   }));
   const total = Number(rows[0]?.total_count ?? 0);
   const totalPages = Math.max(1, Math.ceil(total / SEARCH_PAGE_SIZE));
