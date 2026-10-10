@@ -65,13 +65,24 @@ export default async function PlayerPage({ searchParams }: { searchParams: Promi
   const nextBooking = nextResult.data;
   const availabilityRows = availabilityResult.data ?? [];
   const imagePaths = availabilityRows.flatMap((row) => row.cover_object_path ? [row.cover_object_path] : []);
-  const { data: signedImages } = imagePaths.length
-    ? await supabase.storage.from("venue-media").createSignedUrls(imagePaths, 3600)
-    : { data: [] };
+  const courtIds = availabilityRows.map((row) => row.court_id);
+  const [signedImagesResult, ratingsResult] = await Promise.all([
+    imagePaths.length
+      ? supabase.storage.from("venue-media").createSignedUrls(imagePaths, 3600)
+      : Promise.resolve({ data: [] }),
+    courtIds.length
+      ? supabase.from("courts").select("id, rating_average, review_count").in("id", courtIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+  const signedImages = signedImagesResult.data ?? [];
   const signedByPath = new Map((signedImages ?? []).map((image) => [image.path, image.signedUrl]));
+  const ratingByCourt = new Map((ratingsResult.data ?? []).map((court) => [court.id, court]));
   const availableCourts: SearchResultWithImage[] = availabilityRows.map((row) => ({
     ...row,
     signedCoverUrl: row.cover_object_path ? signedByPath.get(row.cover_object_path) ?? null : null,
+    ratingAverage: Number(ratingByCourt.get(row.court_id)?.rating_average ?? 0) || null,
+    reviewCount: Number(ratingByCourt.get(row.court_id)?.review_count ?? 0),
+    nextSlots: [{ slotDate: row.slot_date, startTime: row.start_time, priceBob: Number(row.price_bob) }],
   }));
 
   return (

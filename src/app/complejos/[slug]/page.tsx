@@ -200,8 +200,26 @@ export default async function VenueDetailPage({ params, searchParams }: { params
         <section className="venue-detail-hero">
           {cover && <Image alt={cover.alt_text} fill priority sizes="100vw" src={cover.signedUrl} unoptimized />}
           <div className="venue-detail-overlay" />
-          <div className="container venue-detail-heading"><span>Complejo verificado</span><h1>{venue.commercial_name}</h1><p>{venue.zone} · {venue.city} · ★ {Number(venue.rating_average).toFixed(1)} ({venue.review_count})</p>{isPlayer ? <form action={toggleVenueFavoriteAction}><input name="venue_id" type="hidden" value={venue.id} /><input name="return_path" type="hidden" value={`/complejos/${venue.slug}`} /><button className="favorite-button" type="submit">{favoriteVenue ? "★ Guardado" : "☆ Guardar complejo"}</button></form> : null}</div>
+          <div className="container venue-detail-heading">
+            <span>Complejo verificado</span>
+            <h1>{venue.commercial_name}</h1>
+            <p>{venue.zone} · {venue.city} · {venue.review_count ? `★ ${Number(venue.rating_average).toFixed(1)} (${venue.review_count} reseñas)` : "Nuevo · sin reseñas todavía"}</p>
+            <div className="venue-detail-hero-actions">
+              <Link className="button button--primary" href="#canchas">Ver canchas y horarios</Link>
+              <a className="button venue-detail-map-button" href={`https://www.google.com/maps?q=${venue.latitude},${venue.longitude}`} rel="noreferrer" target="_blank">Cómo llegar</a>
+              {isPlayer ? <form action={toggleVenueFavoriteAction}><input name="venue_id" type="hidden" value={venue.id} /><input name="return_path" type="hidden" value={`/complejos/${venue.slug}`} /><button className="favorite-button" type="submit">{favoriteVenue ? "★ Guardado" : "☆ Guardar complejo"}</button></form> : null}
+            </div>
+          </div>
         </section>
+        <nav aria-label="Secciones del complejo" className="venue-section-nav">
+          <div className="container">
+            <Link href="#canchas">Canchas</Link>
+            <Link href="#servicios">Servicios</Link>
+            {gallery.length ? <Link href="#galeria">Galería</Link> : null}
+            <Link href="#resenas">Reseñas</Link>
+            <Link href="#ubicacion">Ubicación</Link>
+          </div>
+        </nav>
         <div className="container venue-detail-layout">
           <div className="venue-detail-main">
             {selectedCourt ? (
@@ -299,8 +317,6 @@ export default async function VenueDetailPage({ params, searchParams }: { params
                 </div>
               </section>
             ) : null}
-            <section><p className="eyebrow">Sobre el complejo</p><h2>Un lugar listo para jugar</h2><p className="venue-description">{venue.description}</p></section>
-            <section><p className="eyebrow">Servicios</p><h2>Todo lo que encontrarás</h2><div className="public-service-list">{(services ?? []).map((service) => <span key={service.id}>✓ {service.name}</span>)}</div></section>
             {courtRows.length > 0 && (
               <section id="canchas">
                 <p className="eyebrow">Canchas disponibles</p>
@@ -337,10 +353,12 @@ export default async function VenueDetailPage({ params, searchParams }: { params
                 </div>
               </section>
             )}
-            {gallery.length > 0 && <section><p className="eyebrow">Galería</p><h2>Conoce el espacio</h2><div className="public-gallery">{gallery.map((photo) => <div key={photo.id}><Image alt={photo.alt_text} fill sizes="(max-width: 700px) 100vw, 320px" src={photo.signedUrl} unoptimized /></div>)}</div></section>}
-            <section><p className="eyebrow">Reseñas verificadas</p><h2>Lo que dicen quienes jugaron</h2>{reviews?.length ? <div className="public-review-list">{reviews.map((review) => <article key={review.id}><div><strong>Jugador verificado</strong><span>{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</span></div><p>{review.comment ?? "Valoración sin comentario."}</p><small>{review.courts?.name}</small></article>)}</div> : <p className="empty-copy">Este complejo todavía no tiene reseñas.</p>}</section>
+            <section id="sobre-el-complejo"><p className="eyebrow">Sobre el complejo</p><h2>Un lugar listo para jugar</h2><p className="venue-description">{venue.description}</p></section>
+            <section id="servicios"><p className="eyebrow">Servicios</p><h2>Todo lo que encontrarás</h2><div className="public-service-list">{(services ?? []).map((service) => <span key={service.id}>✓ {service.name}</span>)}</div></section>
+            {gallery.length > 0 && <section id="galeria"><p className="eyebrow">Galería</p><h2>Conoce el espacio</h2><div className="public-gallery">{gallery.map((photo) => <div key={photo.id}><Image alt={photo.alt_text} fill sizes="(max-width: 700px) 100vw, 320px" src={photo.signedUrl} unoptimized /></div>)}</div></section>}
+            <section id="resenas"><p className="eyebrow">Reseñas verificadas</p><h2>Lo que dicen quienes jugaron</h2>{reviews?.length ? <div className="public-review-list">{reviews.map((review) => <article key={review.id}><div><strong>Jugador verificado</strong><span>{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</span></div><p>{review.comment ?? "Valoración sin comentario."}</p><small>{review.courts?.name}</small></article>)}</div> : <p className="empty-copy">Este complejo todavía no tiene reseñas. Solo podrán valorar jugadores con una reserva completada.</p>}</section>
           </div>
-          <aside className="venue-contact-card">
+          <aside className="venue-contact-card" id="ubicacion">
             <span className="status-dot">Información verificada</span>
             <h2>Contacto y ubicación</h2>
             <dl><div><dt>Dirección</dt><dd>{venue.address}, {venue.zone}</dd></div><div><dt>Teléfono</dt><dd>{venue.phone_e164}</dd></div></dl>

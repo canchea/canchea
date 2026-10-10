@@ -68,9 +68,19 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
   const deposit = Number(depositQuote ?? Math.min(price, 50));
   const formatBob = (value: number) => value.toFixed(Number.isInteger(value) ? 0 : 2);
   const venue = court.venues;
+  const formattedDate = new Intl.DateTimeFormat("es-BO", {
+    dateStyle: "full",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T12:00:00Z`));
+  const endTime = `${String((Number(time.slice(0, 2)) + 1) % 24).padStart(2, "0")}:00`;
 
   return (
-    <PrivateShell title="Revisa tu reserva" description="Confirma los datos antes de iniciar el bloqueo temporal de cinco minutos." links={[...playerNavigation]}>
+    <PrivateShell title="Revisa tu reserva" description="Confirma la cancha, el horario y la seña antes de continuar al pago." links={[...playerNavigation]}>
+      <ol className="booking-flow-steps booking-review-steps" aria-label="Proceso de reserva">
+        <li className="booking-flow-step booking-flow-step--done"><span>1</span><strong>Cancha</strong></li>
+        <li className="booking-flow-step booking-flow-step--done"><span>2</span><strong>Fecha y hora</strong></li>
+        <li className="booking-flow-step booking-flow-step--active"><span>3</span><strong>Confirmar</strong></li>
+      </ol>
       <div className="booking-review-grid">
         <section className="private-card booking-review-card">
           {params.estado === "no-disponible" ? <p className="form-feedback form-feedback--error" role="alert">Ese horario acaba de ser tomado. Elige otra opción.</p> : null}
@@ -78,8 +88,8 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
           <h2>{venue?.commercial_name}</h2>
           <p>{court.name} · {court.sports?.name} · {court.sport_modalities?.name}</p>
           <dl className="booking-summary-list">
-            <div><dt>Fecha</dt><dd>{date}</dd></div>
-            <div><dt>Hora</dt><dd>{time}</dd></div>
+            <div><dt>Fecha</dt><dd className="booking-date-value">{formattedDate}</dd></div>
+            <div><dt>Hora</dt><dd>{time} – {endTime}</dd></div>
             <div><dt>Duración</dt><dd>1 hora</dd></div>
             <div><dt>Zona</dt><dd>{venue?.zone}</dd></div>
             <div><dt>Superficie</dt><dd>{court.court_surfaces?.name}</dd></div>
@@ -91,14 +101,22 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
           <div><span>Seña requerida</span><strong>Bs {formatBob(deposit)}</strong></div>
           <div><span>Saldo en el complejo</span><strong>Bs {formatBob(price - deposit)}</strong></div>
           <p>Pagarás la seña en el siguiente paso. El saldo se paga directamente en el complejo.</p>
+          <section className="booking-policy-summary" aria-label="Resumen de cancelación">
+            <strong>Cancelación clara</strong>
+            <ul>
+              <li>Con 6 horas o más: devolución de la seña menos Bs 20.</li>
+              <li>Con menos de 6 horas o inasistencia: la seña no se devuelve.</li>
+            </ul>
+            <Link href="/cancelaciones">Ver política completa</Link>
+          </section>
           <form action={createBookingHoldAction}>
             <input name="court_id" type="hidden" value={courtId} />
             <input name="starts_at" type="hidden" value={slot.starts_at} />
             <input name="duration_minutes" type="hidden" value={duration} />
             <input name="return_path" type="hidden" value={returnPath} />
-            <SubmitButton pendingText="Bloqueando horario…">Bloquear por 5 minutos</SubmitButton>
+            <SubmitButton pendingText="Asegurando horario…">Reservar y continuar al pago</SubmitButton>
           </form>
-          <Link className="booking-back-link" href={`/complejos/${venue?.slug}?fecha=${date}&hora=${time}&cancha=${courtId}`}>Volver al complejo</Link>
+          <Link className="booking-back-link" href={`/complejos/${venue?.slug}?fecha=${date}&desde=${date}&hora=${time}&cancha=${courtId}#disponibilidad`}>Cambiar fecha u hora</Link>
         </aside>
       </div>
     </PrivateShell>

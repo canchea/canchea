@@ -60,9 +60,12 @@ test.describe("recorrido público de reserva", () => {
     await expect(page).toHaveURL(/\/buscar\?/);
     const firstResult = page.locator(".search-result-card").first();
     await expect(firstResult).toBeVisible({ timeout: 20_000 });
+    await expect(firstResult.getByText("Próximos horarios para reservar")).toBeVisible();
+    await expect(firstResult.getByText("Verificado", { exact: true })).toBeVisible();
     await firstResult.getByRole("link", { name: "Ver horarios" }).click();
 
     await expect(page.locator("main h1")).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Secciones del complejo" })).toBeVisible();
     const reserveSelectedSlot = page.locator(".availability-slot").first();
     await expect(reserveSelectedSlot).toBeVisible({ timeout: 20_000 });
     await expect(reserveSelectedSlot).toContainText("1 hora");
@@ -160,7 +163,7 @@ test.describe.serial("@authenticated reserva con pago Mock y trazabilidad por ro
     await expect(firstAvailableSlot).toBeVisible({ timeout: 20_000 });
     await firstAvailableSlot.click();
     await expect(page.getByRole("heading", { name: "Revisa tu reserva" })).toBeVisible();
-    await page.getByRole("button", { name: "Bloquear por 5 minutos" }).click();
+    await page.getByRole("button", { name: "Reservar y continuar al pago" }).click();
 
     await expect(page).toHaveURL(/\/reservar\/[0-9a-f-]{36}$/i, { timeout: 20_000 });
     const reservationHeading = page.locator(".private-heading h1");
