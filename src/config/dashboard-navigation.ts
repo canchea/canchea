@@ -8,13 +8,11 @@ export const playerNavigation = [
 ] as const;
 
 export const ownerNavigation = [
-  { href: "/propietario/dashboard", label: "Resumen" },
-  { href: "/propietario/reservas", label: "Reservas" },
+  { href: "/propietario/dashboard", label: "Inicio" },
   { href: "/propietario/calendario", label: "Calendario" },
-  { href: "/propietario", label: "Mi complejo" },
+  { href: "/propietario/reservas", label: "Reservas" },
   { href: "/propietario/canchas", label: "Canchas" },
-  { href: "/propietario/disponibilidad", label: "Disponibilidad" },
-  { href: "/notificaciones", label: "Notificaciones" },
+  { href: "/propietario", label: "Configuración" },
 ] as const;
 
 export const adminNavigation = [

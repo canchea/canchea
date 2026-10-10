@@ -7,12 +7,16 @@ export function PrivateShell({
   children,
   links = [],
   hideHeading = false,
+  wide = false,
+  eyebrow = "Área protegida",
 }: {
   title: string;
   description: string;
   children: React.ReactNode;
   links?: { href: string; label: string }[];
   hideHeading?: boolean;
+  wide?: boolean;
+  eyebrow?: string;
 }) {
   const primaryLink = links[0];
 
@@ -29,10 +33,10 @@ export function PrivateShell({
           <form action="/auth/cerrar-sesion" method="post"><button type="submit">Cerrar sesión</button></form>
         </nav>
       </header>
-      <div className="private-container">
+      <div className={`private-container${wide ? " private-container--wide" : ""}`}>
         {!hideHeading ? (
           <section className="private-heading">
-            <p className="eyebrow">Área protegida</p>
+            <p className="eyebrow">{eyebrow}</p>
             <h1>{title}</h1>
             <p>{description}</p>
           </section>

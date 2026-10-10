@@ -1160,6 +1160,8 @@ select {
   padding: 54px 20px 80px;
 }
 
+.private-container--wide { max-width: 1240px; }
+
 .private-heading {
   margin-bottom: 28px;
   max-width: 690px;
@@ -2073,6 +2075,105 @@ select {
 }
 
 /* Fases 9–14 · operación, finanzas y fidelización */
+.owner-today-bar {
+  align-items: flex-start;
+  background: var(--brand-primary-dark);
+  border-radius: 18px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 20px;
+}
+.owner-today-bar > div:first-child { display: grid; gap: 5px; }
+.owner-today-bar > div:first-child span { color: var(--brand-primary); font-size: .63rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.owner-today-bar > div:first-child strong { font-size: clamp(.9rem, 3vw, 1.15rem); }
+.owner-today-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.owner-today-actions .button--secondary { background: transparent; border-color: rgba(255, 255, 255, .3); color: white; }
+
+.owner-kpi-grid { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 18px; }
+.owner-kpi-card { background: white; border: 1px solid var(--brand-border); border-radius: 15px; box-shadow: 0 8px 28px rgba(8, 34, 25, .05); display: grid; gap: 6px; min-width: 0; padding: 16px; }
+.owner-kpi-card > span { color: var(--brand-muted); font-size: .62rem; font-weight: 800; }
+.owner-kpi-card > strong { font-size: clamp(1.25rem, 5vw, 1.7rem); letter-spacing: -.045em; }
+.owner-kpi-card > small { color: var(--brand-muted); font-size: .56rem; line-height: 1.4; }
+.owner-kpi-card--primary { background: linear-gradient(145deg, #22c55e, #10b981); border-color: transparent; color: #04150e; }
+.owner-kpi-card--primary > span,
+.owner-kpi-card--primary > small { color: #073d24; }
+
+.owner-status-notice { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; }
+.owner-status-notice a { color: inherit; font-weight: 900; text-decoration: underline; }
+.owner-control-grid { display: grid; gap: 16px; margin-bottom: 18px; }
+.owner-calendar-card,
+.owner-today-card,
+.owner-courts-card { min-width: 0; }
+.owner-card-heading { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; }
+.owner-card-heading h2 { font-size: clamp(1.2rem, 4vw, 1.55rem); letter-spacing: -.04em; margin: 4px 0 0; }
+.owner-card-heading p:not(.eyebrow) { color: var(--brand-muted); font-size: .61rem; margin: 6px 0 0; }
+.owner-card-heading > span { align-items: center; background: var(--brand-primary-dark); border-radius: 50%; color: white; display: flex; flex: 0 0 auto; font-size: .7rem; font-weight: 900; height: 34px; justify-content: center; width: 34px; }
+.owner-calendar-controls { align-items: center; background: var(--brand-background); border-radius: 10px; display: flex; flex: 0 0 auto; padding: 3px; }
+.owner-calendar-controls a { align-items: center; border-radius: 8px; display: flex; font-size: .65rem; font-weight: 850; justify-content: center; min-height: 38px; min-width: 38px; padding: 7px 9px; }
+.owner-calendar-controls a:nth-child(2) { background: white; box-shadow: 0 2px 8px rgba(8, 34, 25, .08); min-width: 58px; }
+.owner-week-grid { display: grid; gap: 7px; grid-template-columns: repeat(7, minmax(126px, 1fr)); margin-top: 20px; overflow-x: auto; padding-bottom: 8px; scrollbar-color: #b5c8bc transparent; }
+.owner-day-column { background: #f7faf8; border: 1px solid #e2ebe5; border-radius: 12px; min-height: 230px; overflow: hidden; }
+.owner-day-column > header { align-items: baseline; border-bottom: 1px solid #e2ebe5; display: flex; gap: 5px; padding: 10px; text-transform: capitalize; }
+.owner-day-column > header span { color: var(--brand-muted); font-size: .59rem; font-weight: 850; }
+.owner-day-column > header strong { font-size: .9rem; }
+.owner-day-column > header small { color: var(--brand-muted); font-size: .55rem; }
+.owner-day-column--today { border-color: var(--brand-primary); box-shadow: 0 0 0 2px rgba(34, 197, 94, .12); }
+.owner-day-column--today > header { background: #e8faef; border-color: #b7ecc8; }
+.owner-day-column > div { display: grid; gap: 6px; padding: 7px; }
+.owner-calendar-booking { background: white; border-left: 3px solid var(--brand-primary); border-radius: 8px; display: grid; gap: 2px; padding: 8px; }
+.owner-calendar-booking:hover { box-shadow: 0 5px 14px rgba(8, 34, 25, .08); transform: translateY(-1px); }
+.owner-calendar-booking > strong { font-size: .66rem; }
+.owner-calendar-booking > span { font-size: .6rem; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.owner-calendar-booking > small { color: var(--brand-muted); font-size: .54rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.owner-calendar-booking--in_progress { border-left-color: #2563eb; }
+.owner-calendar-booking--completed { border-left-color: #86a197; opacity: .72; }
+.owner-calendar-booking--no_show { border-left-color: #dc2626; }
+.owner-day-empty { color: #97a39c; font-size: .56rem; padding: 8px 2px; text-align: center; }
+.owner-calendar-legend { align-items: center; color: var(--brand-muted); display: flex; font-size: .56rem; gap: 14px; justify-content: space-between; margin-top: 8px; }
+.owner-calendar-legend span { align-items: center; display: flex; gap: 6px; }
+.owner-calendar-legend i { background: var(--brand-primary); border-radius: 2px; height: 10px; width: 3px; }
+
+.owner-today-card { align-self: start; }
+.owner-today-list { display: grid; gap: 0; margin-top: 15px; }
+.owner-today-list > a { align-items: center; border-top: 1px solid var(--brand-border); display: grid; gap: 9px; grid-template-columns: 48px minmax(0, 1fr); padding: 12px 0; }
+.owner-today-list time { color: #08783e; font-size: .7rem; font-weight: 900; }
+.owner-today-list > a > div { display: grid; gap: 3px; min-width: 0; }
+.owner-today-list strong { font-size: .68rem; }
+.owner-today-list span { color: var(--brand-muted); font-size: .58rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.owner-today-list .booking-status { grid-column: 2; justify-self: start; }
+.owner-today-empty { background: var(--brand-background); border-radius: 12px; margin-top: 16px; padding: 20px; text-align: center; }
+.owner-today-empty strong { font-size: .78rem; }
+.owner-today-empty p { color: var(--brand-muted); font-size: .62rem; margin: 5px 0 0; }
+.owner-card-link { color: #08783e; display: inline-flex; font-size: .63rem; font-weight: 900; margin-top: 15px; min-height: 44px; padding-top: 12px; }
+
+.owner-courts-card { margin-bottom: 18px; }
+.owner-court-list { display: grid; gap: 8px; margin-top: 18px; }
+.owner-court-list > article { align-items: center; background: var(--brand-background); border-radius: 11px; display: grid; gap: 11px; grid-template-columns: auto minmax(0, 1fr) auto; padding: 12px; }
+.owner-court-status { background: #94a3b8; border-radius: 50%; height: 9px; width: 9px; }
+.owner-court-status--active { background: var(--brand-primary); box-shadow: 0 0 0 4px rgba(34, 197, 94, .12); }
+.owner-court-status--inactive { background: #f59e0b; }
+.owner-court-list article > div:nth-child(2) { display: grid; gap: 3px; }
+.owner-court-list article > div:nth-child(2) strong { font-size: .7rem; }
+.owner-court-list article > div:nth-child(2) small { color: var(--brand-muted); font-size: .57rem; }
+.owner-court-list article > div:last-child { display: flex; gap: 6px; }
+.owner-court-list article > div:last-child a { background: white; border: 1px solid var(--brand-border); border-radius: 8px; font-size: .59rem; font-weight: 850; min-height: 38px; padding: 9px; }
+.owner-inline-empty { align-items: center; background: var(--brand-background); border-radius: 12px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; margin-top: 18px; padding: 16px; }
+.owner-inline-empty p { color: var(--brand-muted); font-size: .68rem; margin: 0; }
+.owner-quick-links { display: grid; gap: 10px; }
+.owner-quick-links > a { background: white; border: 1px solid var(--brand-border); border-radius: 13px; display: grid; gap: 4px; min-height: 82px; padding: 16px; }
+.owner-quick-links > a::after { color: #08783e; content: "→"; font-weight: 900; justify-self: end; margin-top: -26px; }
+.owner-quick-links strong { font-size: .7rem; }
+.owner-quick-links span { color: var(--brand-muted); font-size: .59rem; }
+.owner-trial-note { color: var(--brand-muted); font-size: .59rem; margin: 14px 0 0; text-align: center; }
+.owner-empty-dashboard { align-items: center; display: grid; gap: 18px; }
+.owner-empty-dashboard > span { align-items: center; background: var(--brand-primary); border-radius: 50%; display: flex; font-size: .72rem; font-weight: 900; height: 44px; justify-content: center; width: 44px; }
+.owner-empty-dashboard h2 { font-size: 1.2rem; margin: 0 0 7px; }
+.owner-empty-dashboard p { color: var(--brand-muted); font-size: .68rem; line-height: 1.55; margin: 0; }
+
 .dashboard-metrics { display: grid; gap: 12px; margin-bottom: 20px; }
 .dashboard-metrics > article,
 .admin-stats > article { background: white; border: 1px solid var(--brand-border); border-radius: 16px; box-shadow: var(--shadow-card); display: grid; gap: 7px; padding: 18px; }
@@ -2154,6 +2255,12 @@ select {
 .admin-operations-card { margin-bottom: 24px; }
 
 @media (min-width: 700px) {
+  .owner-today-bar { align-items: center; flex-direction: row; }
+  .owner-kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .owner-court-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .owner-quick-links { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .owner-empty-dashboard { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .owner-week-grid { grid-template-columns: repeat(7, minmax(96px, 1fr)); overflow-x: visible; }
   .dashboard-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .operations-form { align-items: end; grid-template-columns: 1.4fr 1fr 1fr auto; }
   .admin-data-list > article { align-items: center; grid-template-columns: minmax(0, 1.2fr) auto minmax(240px, .8fr); }
@@ -2166,6 +2273,7 @@ select {
 }
 
 @media (min-width: 1080px) {
+  .owner-control-grid { grid-template-columns: minmax(0, 1.65fr) minmax(270px, .72fr); }
   .booking-calendar--week { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
