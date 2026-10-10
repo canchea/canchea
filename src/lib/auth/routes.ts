@@ -2,7 +2,7 @@ import type { AppRole } from "@/types/database";
 
 export function destinationForRole(role: AppRole | null) {
   if (role === "player") return "/jugador";
-  if (role === "venue_owner") return "/propietario";
+  if (role === "venue_owner") return "/propietario/dashboard";
   if (role === "super_admin") return "/admin";
   return "/onboarding";
 }
