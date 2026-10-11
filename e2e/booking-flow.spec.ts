@@ -134,13 +134,17 @@ test.describe("@authenticated inicio del jugador", () => {
     await expect(page.getByRole("heading", { level: 1, name: "¿Dónde quieres jugar?" })).toBeVisible();
     await expect(page.getByRole("form", { name: "Comenzar una reserva" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Ver canchas disponibles" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "CANCHEA, ir a Reservar" })).toHaveAttribute("href", "/jugador");
+    await expect(page.getByRole("heading", { level: 2, name: "Cerca de ti" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Mejor valoradas" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Más reservadas" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Nuevos complejos" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "CANCHEA, ir a Inicio" })).toHaveAttribute("href", "/jugador");
 
     await page.getByRole("link", { name: "Mi perfil" }).click();
     await expect(page).toHaveURL(/\/cuenta/);
-    await expect(page.getByRole("link", { name: "Reservar", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Inicio", exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "Volver a reservar" })).toHaveAttribute("href", "/jugador");
-    await page.getByRole("link", { name: "CANCHEA, ir a Reservar" }).click();
+    await page.getByRole("link", { name: "CANCHEA, ir a Inicio" }).click();
     await expect(page).toHaveURL(/\/jugador/);
     await expect(page.getByRole("heading", { level: 1, name: "¿Dónde quieres jugar?" })).toBeVisible();
   });
