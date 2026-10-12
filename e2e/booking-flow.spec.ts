@@ -132,13 +132,13 @@ test.describe("@authenticated inicio del jugador", () => {
     await signIn(page, playerEmail, playerPassword!);
     await expect(page).toHaveURL(/\/jugador/);
     await expect(page.getByRole("heading", { level: 1, name: "¿Dónde quieres jugar?" })).toBeVisible();
-    await expect(page.getByRole("form", { name: "Comenzar una reserva" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Ver canchas disponibles" })).toBeVisible();
+    await expect(page.getByRole("form", { name: "Buscar una cancha" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Buscar cancha" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "Cerca de ti" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "Mejor valoradas" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "Más reservadas" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "Nuevos complejos" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "CANCHEA, ir a Inicio" })).toHaveAttribute("href", "/jugador");
+    await expect(page.getByRole("link", { name: "CANCHEA, ir al inicio de reservas" })).toHaveAttribute("href", "/jugador");
 
     await page.getByRole("link", { name: "Mi perfil" }).click();
     await expect(page).toHaveURL(/\/cuenta/);
