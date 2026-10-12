@@ -10,10 +10,12 @@ function formatTime(value: string) {
 export function PlayerDiscoveryCard({
   result,
   badge,
+  availabilityLabel,
   eager = false,
 }: {
   result: SearchResultWithImage;
   badge: string;
+  availabilityLabel: string;
   eager?: boolean;
 }) {
   const slot = result.nextSlots[0];
@@ -27,42 +29,50 @@ export function PlayerDiscoveryCard({
     : `/complejos/${result.venue_slug}`;
 
   return (
-    <article className="player-discovery-card">
-      <Link className="player-discovery-media" href={`/complejos/${result.venue_slug}`}>
+    <article className="venue-card player-discovery-card">
+      <Link className="venue-image-wrap player-discovery-media" href={`/complejos/${result.venue_slug}`}>
         {result.signedCoverUrl ? (
           <Image
             alt={result.cover_alt_text ?? `Cancha ${result.court_name}`}
+            className="venue-image"
             fill
             loading={eager ? "eager" : "lazy"}
-            sizes="(max-width: 760px) 78vw, 310px"
+            sizes="(max-width: 720px) 83vw, (max-width: 1100px) 44vw, 31vw"
             src={result.signedCoverUrl}
             unoptimized
           />
         ) : (
           <span className="player-discovery-placeholder">CANCHEA</span>
         )}
-        <span className="player-discovery-badge">{badge}</span>
-        <span className="player-discovery-sport">{result.sport_name}</span>
+        <span className="venue-badge">{badge}</span>
+        <span className="sport-pill">{result.sport_name}</span>
       </Link>
-      <div className="player-discovery-body">
-        <div className="player-discovery-title">
+      <div className="venue-body">
+        <div className="venue-title-row">
           <div>
-            <span><Icon name="location" size={14} /> {result.venue_zone}</span>
+            <p className="venue-area"><Icon name="location" size={15} /> {result.venue_zone}</p>
             <h3>{result.venue_name}</h3>
           </div>
-          <div className="player-discovery-rating" aria-label={result.reviewCount ? `${result.ratingAverage?.toFixed(1)} de 5, ${result.reviewCount} reseñas verificadas` : "Complejo nuevo, sin reseñas"}>
-            <Icon name="star" size={14} />
+          <div className="rating" aria-label={result.reviewCount ? `${result.ratingAverage?.toFixed(1)} de 5, ${result.reviewCount} reseñas verificadas` : "Complejo nuevo, sin reseñas"}>
+            <Icon name="star" size={15} />
             <strong>{result.reviewCount ? result.ratingAverage?.toFixed(1) : "Nuevo"}</strong>
+            {result.reviewCount ? <small>({result.reviewCount})</small> : null}
           </div>
         </div>
-        <p>{result.court_name} · {result.modality_name}</p>
-        <div className="player-discovery-action">
+        <p className="court-name">{result.court_name} · {result.modality_name}</p>
+        <div className="amenity-list" aria-label="Características de la reserva">
+          <span>Reserva en línea</span>
+          <span>Bloques de 1 hora</span>
+        </div>
+        <div className="venue-footer">
           <div>
-            <span>{slot ? "Disponible hoy" : "Precio por hora"}</span>
-            <strong>{slot ? formatTime(slot.startTime) : `Bs ${Number(result.price_bob).toFixed(0)}`}</strong>
+            <span className="price-label">Desde</span>
+            <strong>Bs {slot ? slot.priceBob.toFixed(0) : Number(result.price_bob).toFixed(0)}</strong>
+            <span className="price-unit"> / hora</span>
           </div>
-          <Link href={reservationHref}>
-            {slot ? `Reservar · Bs ${slot.priceBob.toFixed(0)}` : "Ver complejo"}
+          <Link className="slot-button" href={reservationHref}>
+            {slot ? `${availabilityLabel} · ${formatTime(slot.startTime)}` : "Ver complejo"}
+            <Icon name="chevron" size={16} />
           </Link>
         </div>
       </div>
