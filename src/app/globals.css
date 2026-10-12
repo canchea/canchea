@@ -2257,6 +2257,32 @@ select {
 .admin-data-list article > div > span,
 .admin-data-list article > div > small { color: var(--brand-muted); font-size: .63rem; margin-top: 4px; }
 .admin-data-list form { display: grid; gap: 7px; }
+
+.billing-balance-hero { background: linear-gradient(135deg, #0f3d2e, #06271d); border-radius: 22px; color: white; display: grid; gap: 1px; margin-bottom: 20px; overflow: hidden; }
+.billing-balance-hero > div { background: rgba(255, 255, 255, .04); display: grid; gap: 10px; padding: 24px; }
+.billing-balance-hero > div:first-child > strong { font-size: clamp(2.5rem, 10vw, 4.8rem); letter-spacing: -.07em; line-height: 1; }
+.billing-balance-hero > div:last-child > strong { font-size: clamp(1.7rem, 6vw, 2.7rem); letter-spacing: -.05em; }
+.billing-balance-hero span,
+.billing-balance-hero small { color: #c1d8ce; }
+.billing-balance-hero .booking-status { color: inherit; justify-self: start; }
+.billing-how-it-works .steps-list { margin: 22px 0; }
+.billing-how-it-works > p:last-child { color: var(--brand-muted); line-height: 1.65; }
+.billing-how-it-works > p:last-child a { color: #08783e; font-weight: 800; }
+.wallet-transaction-list { display: grid; margin-top: 18px; }
+.wallet-transaction-list article { align-items: center; border-bottom: 1px solid var(--brand-border); display: flex; gap: 18px; justify-content: space-between; padding: 15px 0; }
+.wallet-transaction-list article:last-child { border-bottom: 0; }
+.wallet-transaction-list article > div { display: grid; gap: 4px; min-width: 0; }
+.wallet-transaction-list article > div:last-child { flex: 0 0 auto; text-align: right; }
+.wallet-transaction-list span,
+.wallet-transaction-list small { color: var(--brand-muted); font-size: .62rem; }
+.wallet-transaction-list strong { font-size: .72rem; }
+.wallet-amount { color: #9a3412; }
+.wallet-amount--positive { color: #08783e; }
+.owner-reservation-help { color: var(--brand-muted); line-height: 1.6; max-width: 760px; }
+
+@media (min-width: 760px) {
+  .billing-balance-hero { grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr); }
+}
 .admin-data-list input,
 .admin-data-list select,
 .admin-data-list textarea,

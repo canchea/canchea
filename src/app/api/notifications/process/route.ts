@@ -59,7 +59,7 @@ async function processDeliveries(request: Request) {
         p_delivery_id: delivery.delivery_id,
         p_success: false,
         p_provider: provider?.name ?? "unconfigured",
-        p_provider_message_id: null,
+        p_provider_message_id: undefined,
         p_error_code: recipient ? "PROVIDER_NOT_CONFIGURED" : "RECIPIENT_MISSING",
       });
       continue;
@@ -77,7 +77,7 @@ async function processDeliveries(request: Request) {
         p_success: true,
         p_provider: provider.name,
         p_provider_message_id: result.providerMessageId,
-        p_error_code: null,
+        p_error_code: undefined,
       });
       if (error) throw new Error("DELIVERY_UPDATE_FAILED");
       sent += 1;
@@ -87,7 +87,7 @@ async function processDeliveries(request: Request) {
         p_delivery_id: delivery.delivery_id,
         p_success: false,
         p_provider: provider.name,
-        p_provider_message_id: null,
+        p_provider_message_id: undefined,
         p_error_code: errorCode(error),
       });
     }

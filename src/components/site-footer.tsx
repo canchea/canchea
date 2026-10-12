@@ -12,7 +12,7 @@ export function SiteFooter() {
         <div><h2>Información</h2><Link href="/terminos">Términos</Link><Link href="/privacidad">Privacidad</Link><Link href="/cancelaciones">Cancelaciones</Link><Link href="/soporte">Soporte</Link></div>
         <div><h2>Ciudad inicial</h2><span>{brand.city}</span><span>{brand.country}</span></div>
       </div>
-      <div className="container footer-bottom"><p>© {new Date().getFullYear()} {brand.name}. Reserva. Juega. Disfruta.</p><p>Piloto web con pagos de prueba.</p></div>
+      <div className="container footer-bottom"><p>© {new Date().getFullYear()} {brand.name}. Reserva. Juega. Disfruta.</p><p>Reserva gratis y paga en el complejo.</p></div>
     </footer>
   );
 }

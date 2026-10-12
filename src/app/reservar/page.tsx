@@ -62,10 +62,7 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
     );
   }
 
-  // Misma regla que create_booking_hold: la seña cubre siempre la comisión.
-  const { data: depositQuote } = await supabase.rpc("get_booking_deposit_quote", { p_price: Number(slot.price_bob) });
   const price = Number(slot.price_bob);
-  const deposit = Number(depositQuote ?? Math.min(price, 50));
   const formatBob = (value: number) => value.toFixed(Number.isInteger(value) ? 0 : 2);
   const venue = court.venues;
   const formattedDate = new Intl.DateTimeFormat("es-BO", {
@@ -75,7 +72,7 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
   const endTime = `${String((Number(time.slice(0, 2)) + 1) % 24).padStart(2, "0")}:00`;
 
   return (
-    <PrivateShell title="Revisa tu reserva" description="Confirma la cancha, el horario y la seña antes de continuar al pago." links={[...playerNavigation]}>
+    <PrivateShell title="Revisa tu reserva" description="Confirma la cancha y el horario. No necesitas pagar para reservar." links={[...playerNavigation]}>
       <ol className="booking-flow-steps booking-review-steps" aria-label="Proceso de reserva">
         <li className="booking-flow-step booking-flow-step--done"><span>1</span><strong>Cancha</strong></li>
         <li className="booking-flow-step booking-flow-step--done"><span>2</span><strong>Fecha y hora</strong></li>
@@ -84,6 +81,7 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
       <div className="booking-review-grid">
         <section className="private-card booking-review-card">
           {params.estado === "no-disponible" ? <p className="form-feedback form-feedback--error" role="alert">Ese horario acaba de ser tomado. Elige otra opción.</p> : null}
+          {params.estado === "complejo-sin-saldo" ? <p className="form-feedback form-feedback--error" role="alert">El complejo pausó temporalmente las reservas online. Elige otra cancha disponible.</p> : null}
           <p className="eyebrow">Tu selección</p>
           <h2>{venue?.commercial_name}</h2>
           <p>{court.name} · {court.sports?.name} · {court.sport_modalities?.name}</p>
@@ -96,16 +94,16 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
           </dl>
         </section>
         <aside className="private-card booking-price-card">
-          <p className="eyebrow">Resumen de pago</p>
+          <p className="eyebrow">Resumen de la reserva</p>
           <div><span>Precio por 1 hora</span><strong>Bs {formatBob(price)}</strong></div>
-          <div><span>Seña requerida</span><strong>Bs {formatBob(deposit)}</strong></div>
-          <div><span>Saldo en el complejo</span><strong>Bs {formatBob(price - deposit)}</strong></div>
-          <p>Pagarás la seña en el siguiente paso. El saldo se paga directamente en el complejo.</p>
+          <div><span>Pago ahora</span><strong>Bs 0</strong></div>
+          <div><span>Pago en el complejo</span><strong>Bs {formatBob(price)}</strong></div>
+          <p>La reserva es gratuita. Pagarás el precio completo directamente al complejo cuando vayas a jugar.</p>
           <section className="booking-policy-summary" aria-label="Resumen de cancelación">
-            <strong>Cancelación clara</strong>
+            <strong>Reserva con compromiso</strong>
             <ul>
-              <li>Con 6 horas o más: devolución de la seña menos Bs 20.</li>
-              <li>Con menos de 6 horas o inasistencia: la seña no se devuelve.</li>
+              <li>Si cambias de plan, cancela desde tu cuenta para liberar el horario.</li>
+              <li>Las inasistencias reiteradas pueden limitar futuras reservas.</li>
             </ul>
             <Link href="/cancelaciones">Ver política completa</Link>
           </section>
@@ -114,7 +112,7 @@ export default async function ReservationReviewPage({ searchParams }: { searchPa
             <input name="starts_at" type="hidden" value={slot.starts_at} />
             <input name="duration_minutes" type="hidden" value={duration} />
             <input name="return_path" type="hidden" value={returnPath} />
-            <SubmitButton pendingText="Asegurando horario…">Reservar y continuar al pago</SubmitButton>
+            <SubmitButton pendingText="Confirmando reserva…">Confirmar reserva gratis</SubmitButton>
           </form>
           <Link className="booking-back-link" href={`/complejos/${venue?.slug}?fecha=${date}&desde=${date}&hora=${time}&cancha=${courtId}#disponibilidad`}>Cambiar fecha u hora</Link>
         </aside>

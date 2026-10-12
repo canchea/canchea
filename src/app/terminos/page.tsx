@@ -14,7 +14,7 @@ export default function TermsPage() {
       eyebrow="Reglas claras"
       title="Términos y condiciones"
       summary="Las reglas para buscar, publicar y reservar canchas mediante CANCHEA durante el piloto web."
-      notice={<p>CANCHEA se encuentra en un piloto controlado. Los pagos disponibles son simulaciones y no representan cobros reales. Antes de una apertura comercial, estos términos deberán ser revisados con asesoría jurídica boliviana y completados con la identidad legal del operador.</p>}
+      notice={<p>CANCHEA se encuentra en un piloto controlado. La plataforma no cobra al jugador por reservar: el precio se paga directamente al complejo. Antes de una apertura comercial, estos términos deberán ser revisados con asesoría jurídica boliviana y completados con la identidad legal del operador.</p>}
       sections={[
         {
           id: "alcance",
@@ -29,12 +29,12 @@ export default function TermsPage() {
         {
           id: "reservas",
           title: "3. Reservas y precios",
-          content: <><p>La disponibilidad y el precio vigentes se muestran antes de confirmar. Actualmente una reserva debe solicitarse con al menos una hora de anticipación y el horario se retiene temporalmente durante cinco minutos mientras se completa el flujo.</p><p>La seña se calcula como el mayor valor entre Bs 50 y la comisión del 10% del horario, sin superar el precio total. El importe exacto siempre se presenta antes de confirmar. Durante el piloto el proveedor de pagos es Mock y no mueve dinero real.</p></>,
+          content: <><p>La disponibilidad y el precio vigentes se muestran antes de confirmar. Actualmente una reserva debe solicitarse con al menos una hora de anticipación y queda confirmada en el momento.</p><p>El jugador no paga a CANCHEA para reservar. Abona el precio completo directamente al complejo al momento de usar la cancha. El complejo mantiene un saldo prepago con CANCHEA para cubrir la comisión de las reservas completadas.</p></>,
         },
         {
           id: "cancelaciones",
           title: "4. Cancelaciones e inasistencias",
-          content: <p>Las devoluciones y penalizaciones se aplican según la <Link href="/cancelaciones">Política de cancelaciones</Link> publicada. Al reservar, el jugador acepta esas condiciones y el complejo se compromete a respetar el horario confirmado.</p>,
+          content: <p>Las cancelaciones e inasistencias se gestionan según la <Link href="/cancelaciones">Política de cancelaciones</Link> publicada. Al reservar, el jugador se compromete a liberar el horario si cambia de plan y el complejo se compromete a respetar la reserva confirmada.</p>,
         },
         {
           id: "contenido",

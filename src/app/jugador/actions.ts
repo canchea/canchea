@@ -30,7 +30,7 @@ export async function cancelBookingAction(formData: FormData) {
   revalidatePath("/jugador");
   revalidatePath("/jugador/reservas");
   revalidatePath("/buscar");
-  redirect(`/reservar/${bookingId}?estado=${data.refund_amount_bob > 0 ? "cancelada-reembolso" : "cancelada"}`);
+  redirect(`/reservar/${bookingId}?estado=cancelada`);
 }
 
 export async function toggleVenueFavoriteAction(formData: FormData) {

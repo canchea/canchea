@@ -11,6 +11,7 @@ export const ownerNavigation = [
   { href: "/propietario/dashboard", label: "Inicio" },
   { href: "/propietario/calendario", label: "Calendario" },
   { href: "/propietario/reservas", label: "Reservas" },
+  { href: "/propietario/facturacion", label: "Saldo CANCHEA" },
   { href: "/propietario/canchas", label: "Canchas" },
   { href: "/propietario", label: "Configuración" },
 ] as const;

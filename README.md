@@ -60,7 +60,8 @@ npm run build
 - Fase 5: horarios semanales, reglas de precio, bloqueos manuales y disponibilidad calculada desde backend.
 - Fase 6: búsqueda pública con filtros, disponibilidad real, precios, distancia opcional, lista y detalle seleccionado.
 - Fase 7: checkout, hold de cinco minutos, prevención transaccional de dobles reservas, códigos públicos, estados e historial.
-- Fase 8: proveedor Mock, órdenes y webhooks idempotentes, seña, estados de pago, ledger y preparación para QR boliviano.
+- Fase 8: historial del prototipo de pagos Mock y base idempotente preservada para futuras integraciones.
+- Piloto comercial: reserva gratuita para el jugador, pago total en el complejo y comisión cubierta por el saldo prepago del proveedor.
 - Fase 9: panel del jugador, historial, cancelaciones escalonadas, favoritos, valoraciones y reclamos.
 - Fase 10: KPIs, calendario, operación de reservas y exportación para propietarios.
 - Fase 11: super admin con KPIs, operaciones, auditoría y configuración global.

@@ -1,8 +1,20 @@
 # Pagos y lanzamiento de CANCHEA
 
-## Decisión recomendada para pagos
+## Decisión vigente para el piloto
 
-Para el piloto boliviano se recomienda **Circle** como primera opción comercial:
+El jugador reserva sin pagar en CANCHEA y abona el precio completo directamente al complejo. La plataforma cobra su comisión del 10% mediante un saldo prepago del complejo:
+
+- al confirmar una reserva se retiene la comisión del saldo disponible;
+- al completar el servicio se captura la comisión;
+- al cancelar o marcar una inasistencia se libera la retención;
+- si el saldo no alcanza, se pausan solamente las nuevas reservas públicas del complejo;
+- el propietario conserva acceso a su calendario, reservas e historial.
+
+Durante el piloto, las recargas se acreditan manualmente por el superadministrador después de verificar el comprobante. Este modelo evita perseguir deudas mensuales y no obliga a CANCHEA a recibir dinero de cada jugador.
+
+## Integración futura opcional
+
+Si más adelante CANCHEA decide cobrar al jugador o automatizar las recargas, **Circle** puede evaluarse como primera opción comercial:
 
 - acepta QR y tarjetas;
 - publica una comisión de 3% + Bs 1 por venta;
@@ -23,12 +35,12 @@ Libélula queda como alternativa empresarial por su REST API, QR, tarjetas y fac
 
 ## Estado técnico
 
-- Pago mock completo y aislado para pruebas.
-- Holds, expiración, idempotencia, auditoría de webhooks y mayor contable completos.
-- Política de seña y comisión CANCHEA 10% parametrizadas. La seña es el mayor entre el monto base (Bs 50) y la comisión, sin superar el precio del horario: la comisión siempre queda cubierta por la seña y CANCHEA nunca debe cobrar saldos al complejo. En cancelaciones tempranas la penalidad se mantiene fija y se devuelve el resto de la seña.
+- El flujo Mock anterior se conserva solo como historial técnico y no participa en reservas nuevas.
+- Billetera prepaga, retención, liberación y captura de comisión implementadas con trazabilidad inmutable.
+- Comisión CANCHEA del 10% parametrizada y cubierta antes de aceptar una reserva.
 - Un propietario puede administrar varias sucursales; cada una tiene su ficha, canchas, horarios, revisión, prueba de 3 meses y liquidación propias.
-- Cancelaciones, reembolsos y liquidaciones completos.
-- El mock debe desactivarse en `platform_settings.mock_payments_enabled` antes de abrir producción.
+- Las reservas nuevas no generan reembolsos porque el jugador no paga por anticipado.
+- El historial de órdenes, reembolsos y liquidaciones del prototipo permanece disponible para auditoría.
 - La interfaz del proveedor real se activa solo después de contar con credenciales y documentación contractual.
 
 ## Email y WhatsApp
@@ -70,17 +82,16 @@ WHATSAPP_TEMPLATE_LANGUAGE=es
 
 ## Checklist antes de publicar
 
-- [ ] Afiliar la empresa a Circle y recibir sandbox, contrato y documentación.
-- [ ] Terminar el adaptador real y probar pago aprobado, rechazado, duplicado, tardío y reembolso.
+- [ ] Definir el QR o cuenta bancaria de CANCHEA para las recargas manuales de complejos.
+- [ ] Conciliar cada comprobante antes de acreditar saldo desde el superadministrador.
 - [ ] Verificar el dominio remitente en Resend.
 - [ ] Crear la app de Meta, registrar el número y aprobar la plantilla de WhatsApp.
 - [ ] Crear secretos distintos y largos para `SUPABASE_SECRET_KEY`, `CRON_SECRET` y webhooks.
 - [ ] Activar protección de contraseñas filtradas al migrar a Supabase Pro. Mientras el piloto siga en Free, CANCHEA exige 10 caracteres con mayúscula, minúscula, número y símbolo.
 - [ ] Configurar las URLs de producción en Supabase Auth y Google OAuth.
-- [ ] Desactivar pagos mock en producción.
 - [ ] Ejecutar `npm run typecheck`, `npm run lint` y `npm run build`.
 - [ ] Ejecutar advisors de seguridad y rendimiento de Supabase.
-- [ ] Hacer una reserva real de monto mínimo y conciliarla contra la liquidación del proveedor.
+- [ ] Hacer una reserva piloto, completarla y comprobar que la comisión pase de retenida a cobrada.
 
 ## Hosting y dominio
 

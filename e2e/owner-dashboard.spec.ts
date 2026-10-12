@@ -23,11 +23,12 @@ test.describe("panel sencillo del propietario", () => {
     await signIn(page);
 
     await expect(page.getByRole("region", { name: "Indicadores principales" })).toContainText("Reservas de hoy");
-    await expect(page.getByRole("region", { name: "Indicadores principales" })).toContainText("Ocupación del mes");
+    await expect(page.getByRole("region", { name: "Indicadores principales" })).toContainText("Saldo CANCHEA");
     await expect(page.getByRole("heading", { name: "Próximos 7 días" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Reservas de hoy" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Canchas registradas" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Cuenta" }).getByRole("link", { name: "Inicio" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Cuenta" }).getByRole("link", { name: "Saldo CANCHEA" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Cuenta" }).getByRole("link", { name: "Configuración" })).toBeVisible();
 
     await page.screenshot({ fullPage: true, path: testInfo.outputPath("owner-dashboard.png") });

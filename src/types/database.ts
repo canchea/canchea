@@ -1538,6 +1538,92 @@ export type Database = {
         }
         Relationships: []
       }
+      venue_billing_accounts: {
+        Row: {
+          available_balance_bob: number
+          created_at: string
+          low_balance_threshold_bob: number
+          reserved_balance_bob: number
+          status: Database["public"]["Enums"]["venue_billing_status"]
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          available_balance_bob?: number
+          created_at?: string
+          low_balance_threshold_bob?: number
+          reserved_balance_bob?: number
+          status?: Database["public"]["Enums"]["venue_billing_status"]
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          available_balance_bob?: number
+          created_at?: string
+          low_balance_threshold_bob?: number
+          reserved_balance_bob?: number
+          status?: Database["public"]["Enums"]["venue_billing_status"]
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_billing_accounts_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_commission_holds: {
+        Row: {
+          amount_bob: number
+          booking_id: string
+          finalized_at: string | null
+          held_at: string
+          id: string
+          release_reason: string | null
+          status: Database["public"]["Enums"]["venue_commission_hold_status"]
+          venue_id: string
+        }
+        Insert: {
+          amount_bob: number
+          booking_id: string
+          finalized_at?: string | null
+          held_at?: string
+          id?: string
+          release_reason?: string | null
+          status?: Database["public"]["Enums"]["venue_commission_hold_status"]
+          venue_id: string
+        }
+        Update: {
+          amount_bob?: number
+          booking_id?: string
+          finalized_at?: string | null
+          held_at?: string
+          id?: string
+          release_reason?: string | null
+          status?: Database["public"]["Enums"]["venue_commission_hold_status"]
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_commission_holds_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_commission_holds_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venue_opening_hours: {
         Row: {
           closes_at: string | null
@@ -1693,6 +1779,83 @@ export type Database = {
           },
         ]
       }
+      venue_wallet_transactions: {
+        Row: {
+          amount_bob: number
+          available_balance_after_bob: number
+          booking_id: string | null
+          commission_hold_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          kind: Database["public"]["Enums"]["venue_wallet_transaction_kind"]
+          metadata: Json
+          reference: string
+          reserved_balance_after_bob: number
+          venue_id: string
+        }
+        Insert: {
+          amount_bob: number
+          available_balance_after_bob: number
+          booking_id?: string | null
+          commission_hold_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description: string
+          id?: string
+          kind: Database["public"]["Enums"]["venue_wallet_transaction_kind"]
+          metadata?: Json
+          reference: string
+          reserved_balance_after_bob: number
+          venue_id: string
+        }
+        Update: {
+          amount_bob?: number
+          available_balance_after_bob?: number
+          booking_id?: string | null
+          commission_hold_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["venue_wallet_transaction_kind"]
+          metadata?: Json
+          reference?: string
+          reserved_balance_after_bob?: number
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_wallet_transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_wallet_transactions_commission_hold_id_fkey"
+            columns: ["commission_hold_id"]
+            isOneToOne: false
+            referencedRelation: "venue_commission_holds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_wallet_transactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_wallet_transactions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venues: {
         Row: {
           address: string
@@ -1829,6 +1992,29 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_credit_venue_wallet: {
+        Args: {
+          p_amount_bob: number
+          p_note?: string
+          p_reference: string
+          p_venue_id: string
+        }
+        Returns: {
+          available_balance_bob: number
+          created_at: string
+          low_balance_threshold_bob: number
+          reserved_balance_bob: number
+          status: Database["public"]["Enums"]["venue_billing_status"]
+          updated_at: string
+          venue_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "venue_billing_accounts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_mark_refund_processed: {
         Args: { p_provider_refund_id?: string; p_refund_id: string }
         Returns: {
@@ -1939,6 +2125,28 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      claim_notification_deliveries: {
+        Args: { p_channels: string[]; p_limit?: number }
+        Returns: {
+          action_url: string
+          body: string
+          channel: string
+          delivery_id: string
+          recipient_email: string
+          recipient_phone: string
+          title: string
+        }[]
+      }
+      complete_notification_delivery: {
+        Args: {
+          p_delivery_id: string
+          p_error_code?: string
+          p_provider: string
+          p_provider_message_id?: string
+          p_success: boolean
+        }
+        Returns: boolean
       }
       complete_onboarding: {
         Args: {
@@ -2132,7 +2340,6 @@ export type Database = {
       delete_my_court_photo: { Args: { p_photo_id: string }; Returns: string }
       delete_my_pricing_rule: { Args: { p_rule_id: string }; Returns: string }
       delete_my_venue_photo: { Args: { p_photo_id: string }; Returns: string }
-      get_booking_deposit_quote: { Args: { p_price: number }; Returns: number }
       get_court_availability: {
         Args: { p_court_id: string; p_date: string }
         Returns: {
@@ -2227,28 +2434,6 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
-      }
-      claim_notification_deliveries: {
-        Args: { p_channels: string[]; p_limit?: number }
-        Returns: {
-          action_url: string | null
-          body: string
-          channel: string
-          delivery_id: string
-          recipient_email: string | null
-          recipient_phone: string | null
-          title: string
-        }[]
-      }
-      complete_notification_delivery: {
-        Args: {
-          p_delivery_id: string
-          p_error_code?: string | null
-          p_provider: string
-          p_provider_message_id?: string | null
-          p_success: boolean
-        }
-        Returns: boolean
       }
       mark_all_my_notifications_read: { Args: never; Returns: number }
       mark_my_notification_read: {
@@ -2357,7 +2542,6 @@ export type Database = {
           p_alt_text: string
           p_kind: Database["public"]["Enums"]["venue_photo_kind"]
           p_object_path: string
-          p_venue_id: string
         }
         Returns: {
           alt_text: string
@@ -2425,6 +2609,7 @@ export type Database = {
         Returns: {
           address: string
           approved_at: string | null
+          booking_count: number
           city: string
           commercial_name: string
           created_at: string
@@ -2459,7 +2644,6 @@ export type Database = {
       }
       save_my_court: {
         Args: {
-          p_venue_id: string
           p_capacity: number
           p_court_id: string
           p_duration_minutes: number[]
@@ -2518,7 +2702,6 @@ export type Database = {
       }
       save_my_venue: {
         Args: {
-          p_venue_id: string
           p_address: string
           p_city: string
           p_commercial_name: string
@@ -2534,6 +2717,7 @@ export type Database = {
         Returns: {
           address: string
           approved_at: string | null
+          booking_count: number
           city: string
           commercial_name: string
           created_at: string
@@ -2669,6 +2853,7 @@ export type Database = {
         Returns: {
           address: string
           approved_at: string | null
+          booking_count: number
           city: string
           commercial_name: string
           created_at: string
@@ -2767,6 +2952,8 @@ export type Database = {
         | "refunded"
       refund_status: "pending" | "processed" | "failed" | "cancelled"
       settlement_status: "not_due" | "pending" | "settled" | "reversed"
+      venue_billing_status: "active" | "low_balance" | "suspended"
+      venue_commission_hold_status: "held" | "captured" | "released"
       venue_photo_kind: "logo" | "cover" | "gallery"
       venue_status:
         | "draft"
@@ -2780,6 +2967,13 @@ export type Database = {
         | "active"
         | "past_due"
         | "cancelled"
+      venue_wallet_transaction_kind:
+        | "pilot_credit"
+        | "top_up"
+        | "commission_hold"
+        | "commission_release"
+        | "commission_capture"
+        | "adjustment"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2968,6 +3162,8 @@ export const Constants = {
       ],
       refund_status: ["pending", "processed", "failed", "cancelled"],
       settlement_status: ["not_due", "pending", "settled", "reversed"],
+      venue_billing_status: ["active", "low_balance", "suspended"],
+      venue_commission_hold_status: ["held", "captured", "released"],
       venue_photo_kind: ["logo", "cover", "gallery"],
       venue_status: [
         "draft",
@@ -2982,6 +3178,14 @@ export const Constants = {
         "active",
         "past_due",
         "cancelled",
+      ],
+      venue_wallet_transaction_kind: [
+        "pilot_credit",
+        "top_up",
+        "commission_hold",
+        "commission_release",
+        "commission_capture",
+        "adjustment",
       ],
     },
   },
@@ -2998,6 +3202,9 @@ export type PaymentOrderStatus = Database["public"]["Enums"]["payment_order_stat
 export type SettlementStatus = Database["public"]["Enums"]["settlement_status"]
 export type ComplaintCategory = Database["public"]["Enums"]["complaint_category"]
 export type ComplaintStatus = Database["public"]["Enums"]["complaint_status"]
+export type VenueBillingStatus = Database["public"]["Enums"]["venue_billing_status"]
+export type VenueCommissionHoldStatus = Database["public"]["Enums"]["venue_commission_hold_status"]
+export type VenueWalletTransactionKind = Database["public"]["Enums"]["venue_wallet_transaction_kind"]
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"]
 export type Venue = Database["public"]["Tables"]["venues"]["Row"]
@@ -3007,4 +3214,7 @@ export type CourtPhoto = Database["public"]["Tables"]["court_photos"]["Row"]
 export type Booking = Database["public"]["Tables"]["bookings"]["Row"]
 export type PaymentOrder = Database["public"]["Tables"]["payment_orders"]["Row"]
 export type BookingStatusHistory = Database["public"]["Tables"]["booking_status_history"]["Row"]
+export type VenueBillingAccount = Database["public"]["Tables"]["venue_billing_accounts"]["Row"]
+export type VenueCommissionHold = Database["public"]["Tables"]["venue_commission_holds"]["Row"]
+export type VenueWalletTransaction = Database["public"]["Tables"]["venue_wallet_transactions"]["Row"]
 export type SearchAvailabilityResult = Database["public"]["Functions"]["search_available_courts"]["Returns"][number]

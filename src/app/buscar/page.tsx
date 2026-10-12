@@ -37,7 +37,10 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     p_offset: (filters.page - 1) * SEARCH_PAGE_SIZE,
   };
   let searchResult = await supabase.rpc("search_available_courts", searchArgs);
-  if (searchResult.error) searchResult = await supabase.rpc("search_available_courts", searchArgs);
+  for (let attempt = 1; searchResult.error && attempt < 3; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, attempt * 250));
+    searchResult = await supabase.rpc("search_available_courts", searchArgs);
+  }
   const { data, error } = searchResult;
   const rows = data ?? [];
   const imagePaths = rows.flatMap((row) => row.cover_object_path ? [row.cover_object_path] : []);

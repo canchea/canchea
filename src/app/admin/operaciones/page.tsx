@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createSettlementAction, processRefundAction, reviewComplaintAction } from "@/app/admin/actions";
+import { createSettlementAction, creditVenueWalletAction, processRefundAction, reviewComplaintAction } from "@/app/admin/actions";
 import { PrivateShell } from "@/components/auth/private-shell";
 import { ConfirmSubmitButton } from "@/components/ui/confirm-submit-button";
 import { adminNavigation } from "@/config/dashboard-navigation";
@@ -23,7 +23,7 @@ export default async function AdminOperationsPage({ searchParams }: { searchPara
   await requireRole("super_admin");
   const query = await searchParams;
   const supabase = await createClient();
-  const [{ data: venues }, { data: bookings }, { data: refunds }, { data: settlements }, { data: complaints }, { data: payments }, { data: audits }] = await Promise.all([
+  const [{ data: venues }, { data: bookings }, { data: refunds }, { data: settlements }, { data: complaints }, { data: payments }, { data: audits }, { data: billingAccounts }] = await Promise.all([
     supabase.from("venues").select("id, commercial_name, status").order("commercial_name"),
     supabase.from("bookings").select("id, public_code, status, starts_at, total_price_bob, deposit_amount_bob, commission_amount_bob, venue_net_amount_bob, courts!bookings_court_id_fkey(name), venues!bookings_venue_id_fkey(commercial_name), profiles!bookings_player_id_fkey(first_name, last_name)").order("created_at", { ascending: false }).limit(50),
     supabase.from("refunds").select("id, booking_id, amount_bob, status, reason, requested_at, provider_refund_id, bookings!refunds_booking_id_fkey(public_code)").order("requested_at", { ascending: false }).limit(50),
@@ -31,15 +31,19 @@ export default async function AdminOperationsPage({ searchParams }: { searchPara
     supabase.from("complaints").select("id, category, status, description, resolution_note, created_at, bookings!complaints_booking_id_fkey(public_code), venues!complaints_venue_id_fkey(commercial_name), profiles!complaints_player_id_fkey(first_name, last_name)").order("created_at", { ascending: false }).limit(50),
     supabase.from("payment_orders").select("id, provider, status, amount_bob, created_at, bookings!payment_orders_booking_id_fkey(public_code)").order("created_at", { ascending: false }).limit(50),
     supabase.from("audit_logs").select("id, action, entity_type, entity_id, created_at").order("created_at", { ascending: false }).limit(20),
+    supabase.from("venue_billing_accounts").select("venue_id, available_balance_bob, reserved_balance_bob, status, updated_at").order("available_balance_bob"),
   ]);
   const notices: Record<string, string> = {
     "reembolso-ok": "El reembolso quedó marcado como procesado y auditado.",
     "reclamo-ok": "El reclamo fue actualizado.",
     "liquidacion-ok": "La liquidación fue creada con sus reservas elegibles.",
     "sin-saldo": "No se encontró saldo elegible para liquidar en ese periodo.",
+    "recarga-ok": "La recarga fue acreditada y quedó registrada en auditoría.",
+    "recarga-error": "No pudimos acreditar la recarga. Revisa el monto y usa una referencia única.",
     error: "No pudimos completar la operación. Revisa los datos e inténtalo nuevamente.",
   };
-  const errorNotice = query.estado === "error" || query.estado === "sin-saldo";
+  const errorNotice = query.estado === "error" || query.estado === "sin-saldo" || query.estado === "recarga-error";
+  const venueName = new Map((venues ?? []).map((venue) => [venue.id, venue.commercial_name]));
 
   return <PrivateShell title="Operaciones" description="Reservas, cobros, devoluciones, reclamos y liquidaciones desde una sola vista." links={[...adminNavigation]}>
     {query.estado && notices[query.estado] ? <div className={`page-notice page-notice--${errorNotice ? "error" : "success"}`}>{notices[query.estado]}</div> : null}
@@ -48,6 +52,18 @@ export default async function AdminOperationsPage({ searchParams }: { searchPara
       <div className="export-links">
         {[["usuarios", "Usuarios"], ["complejos", "Complejos"], ["reservas", "Reservas"], ["pagos", "Pagos"], ["comisiones", "Comisiones"]].map(([entity, label]) => <Link className="button button--secondary" href={`/api/exports/admin/${entity}`} key={entity}>CSV {label}</Link>)}
       </div>
+    </section>
+    <section className="private-card dashboard-section">
+      <div className="section-heading-inline"><div><p className="eyebrow">Comisiones prepagas</p><h2>Saldos de complejos</h2></div><span>{billingAccounts?.length ?? 0}</span></div>
+      <p>Verifica el comprobante recibido antes de acreditar. La referencia debe ser única para evitar duplicar una recarga.</p>
+      <form action={creditVenueWalletAction} className="operations-form">
+        <label>Complejo<select name="venue_id" required><option value="">Selecciona</option>{(venues ?? []).filter((venue) => venue.status === "approved").map((venue) => <option key={venue.id} value={venue.id}>{venue.commercial_name}</option>)}</select></label>
+        <label>Monto en Bs<input min="1" name="amount_bob" required step="0.01" type="number" /></label>
+        <label>Referencia<input maxLength={160} minLength={4} name="reference" placeholder="Banco/QR + número" required /></label>
+        <label>Nota<input maxLength={240} name="note" placeholder="Comprobante verificado" /></label>
+        <ConfirmSubmitButton message="¿Confirmas que verificaste el pago y deseas acreditar este saldo?">Acreditar saldo</ConfirmSubmitButton>
+      </form>
+      <div className="admin-data-list compact-list">{(billingAccounts ?? []).map((account) => <article key={account.venue_id}><div><strong>{venueName.get(account.venue_id) ?? account.venue_id}</strong><span>Disponible Bs {Number(account.available_balance_bob).toFixed(2)} · Retenido Bs {Number(account.reserved_balance_bob).toFixed(2)}</span></div><span className={`booking-status booking-status--${account.status === "suspended" ? "cancelled" : account.status === "low_balance" ? "pending_payment" : "confirmed"}`}>{account.status === "active" ? "Activo" : account.status === "low_balance" ? "Saldo bajo" : "Pausado"}</span></article>)}</div>
     </section>
     <section className="private-card dashboard-section">
       <div className="section-heading-inline"><div><p className="eyebrow">Finanzas</p><h2>Reembolsos</h2></div><span>{(refunds ?? []).filter((item) => item.status === "pending").length}</span></div>

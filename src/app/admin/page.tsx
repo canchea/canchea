@@ -14,11 +14,12 @@ export const metadata: Metadata = { title: "Dashboard administrativo", robots: {
 
 const DAY_MS = 86_400_000;
 const PERIOD_OPTIONS = [7, 30, 90] as const;
-const COMMERCIAL_BOOKING_STATUSES = new Set<BookingStatus>(["confirmed", "in_progress", "completed", "no_show"]);
+const COMMERCIAL_BOOKING_STATUSES = new Set<BookingStatus>(["confirmed", "in_progress", "completed"]);
 
 type DashboardPeriod = (typeof PERIOD_OPTIONS)[number];
 type DashboardBooking = Pick<Booking, "id" | "public_code" | "status" | "starts_at" | "total_price_bob" | "deposit_amount_bob" | "commission_amount_bob" | "venue_id" | "created_at">;
 type LedgerEntry = Pick<Database["public"]["Tables"]["ledger_entries"]["Row"], "account" | "direction" | "amount_bob" | "created_at">;
+type WalletTransaction = Pick<Database["public"]["Tables"]["venue_wallet_transactions"]["Row"], "kind" | "amount_bob" | "created_at">;
 
 function getPeriod(value?: string): DashboardPeriod {
   const parsed = Number(value);
@@ -100,6 +101,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     newProfilesResult,
     pendingRefundsResult,
     activeComplaintsResult,
+    billingAccountsResult,
+    walletTransactionsResult,
   ] = await Promise.all([
     supabase.from("venues").select("*").order("updated_at", { ascending: false }),
     supabase
@@ -115,6 +118,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", currentStart.toISOString()),
     supabase.from("refunds").select("id", { count: "exact", head: true }).eq("status", "pending"),
     supabase.from("complaints").select("id", { count: "exact", head: true }).in("status", ["open", "in_review"]),
+    supabase.from("venue_billing_accounts").select("available_balance_bob, reserved_balance_bob, status"),
+    supabase.from("venue_wallet_transactions").select("kind, amount_bob, created_at").eq("kind", "commission_capture").gte("created_at", previousStart.toISOString()),
   ]);
 
   const allVenues = venues ?? [];
@@ -137,9 +142,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   });
   const currentGmv = sum(currentCommercialBookings.map((booking) => Number(booking.total_price_bob)));
   const previousGmv = sum(previousCommercialBookings.map((booking) => Number(booking.total_price_bob)));
-  const currentRevenue = platformRevenue(currentLedger);
-  const previousRevenue = platformRevenue(previousLedger);
-  const deposits = sum(currentCommercialBookings.map((booking) => Number(booking.deposit_amount_bob)));
+  const walletTransactions = (walletTransactionsResult.data ?? []) as WalletTransaction[];
+  const currentWalletRevenue = sum(walletTransactions.filter((entry) => new Date(entry.created_at) >= currentStart).map((entry) => Number(entry.amount_bob)));
+  const previousWalletRevenue = sum(walletTransactions.filter((entry) => new Date(entry.created_at) >= previousStart && new Date(entry.created_at) < currentStart).map((entry) => Number(entry.amount_bob)));
+  const currentRevenue = platformRevenue(currentLedger) + currentWalletRevenue;
+  const previousRevenue = platformRevenue(previousLedger) + previousWalletRevenue;
+  const availableVenueBalance = sum((billingAccountsResult.data ?? []).map((item) => Number(item.available_balance_bob)));
+  const reservedVenueBalance = sum((billingAccountsResult.data ?? []).map((item) => Number(item.reserved_balance_bob)));
   const averageTicket = currentCommercialBookings.length ? currentGmv / currentCommercialBookings.length : 0;
   const confirmationRate = currentBookings.length ? currentCommercialBookings.length / currentBookings.length * 100 : 0;
   const trend = buildBookingTrend(currentCommercialBookings, period, now);
@@ -190,12 +199,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         <MetricCard featured label="Reservas confirmadas" value={String(currentCommercialBookings.length)} detail={comparisonLabel(currentCommercialBookings.length, previousCommercialBookings.length)} />
         <MetricCard label="GMV reservado" value={`Bs ${formatBob(currentGmv)}`} detail={comparisonLabel(currentGmv, previousGmv)} />
         <MetricCard label="Ingreso CANCHEA" value={`Bs ${formatBob(currentRevenue)}`} detail={comparisonLabel(currentRevenue, previousRevenue)} />
-        <MetricCard label="Señas registradas" value={`Bs ${formatBob(deposits)}`} detail={`En los últimos ${period} días`} />
+        <MetricCard label="Saldo de complejos" value={`Bs ${formatBob(availableVenueBalance)}`} detail={`Bs ${formatBob(reservedVenueBalance)} retenidos`} />
         <MetricCard label="Ticket promedio" value={`Bs ${formatBob(averageTicket)}`} detail="Promedio por reserva confirmada" />
-        <MetricCard label="Confirmación de holds" value={`${confirmationRate.toFixed(0)}%`} detail={`${currentBookings.length} intentos de reserva`} />
+        <MetricCard label="Reservas aseguradas" value={`${confirmationRate.toFixed(0)}%`} detail={`${currentBookings.length} solicitudes registradas`} />
       </section>
 
-      <p className="admin-finance-note"><strong>Lectura financiera:</strong> Ingreso CANCHEA suma comisiones y penalizaciones contabilizadas. No representa utilidad neta porque todavía no descuenta gastos, impuestos ni costos operativos.</p>
+      <p className="admin-finance-note"><strong>Lectura financiera:</strong> Ingreso CANCHEA suma comisiones capturadas al completar reservas y movimientos históricos. Las nuevas reservas no generan cuentas por cobrar: su comisión se retiene del saldo prepago del complejo.</p>
 
       <section className="admin-operational-strip" aria-label="Estado operativo">
         <article><span>Usuarios</span><strong>{profilesResult.count ?? 0}</strong><small>+{newProfilesResult.count ?? 0} en el periodo</small></article>
