@@ -92,6 +92,34 @@ export async function createSettlementAction(formData: FormData) {
   redirect("/admin/operaciones?estado=liquidacion-ok");
 }
 
+export async function creditVenueWalletAction(formData: FormData) {
+  await requireRole("super_admin");
+  const venueId = String(formData.get("venue_id") ?? "").trim();
+  const amount = Number(String(formData.get("amount_bob") ?? "").trim());
+  const reference = String(formData.get("reference") ?? "").trim();
+  const note = String(formData.get("note") ?? "").trim();
+
+  if (!/^[0-9a-f-]{36}$/i.test(venueId) || !Number.isFinite(amount) || amount <= 0 || reference.length < 4) {
+    redirect("/admin/operaciones?estado=recarga-error");
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_credit_venue_wallet", {
+    p_venue_id: venueId,
+    p_amount_bob: amount,
+    p_reference: reference,
+    p_note: note || undefined,
+  });
+  if (error) redirect("/admin/operaciones?estado=recarga-error");
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/operaciones");
+  revalidatePath("/propietario/dashboard");
+  revalidatePath("/propietario/facturacion");
+  revalidatePath("/buscar");
+  redirect("/admin/operaciones?estado=recarga-ok");
+}
+
 export async function updatePlatformSettingAction(formData: FormData) {
   await requireRole("super_admin");
   const key = String(formData.get("key") ?? "").trim();

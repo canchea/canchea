@@ -115,10 +115,10 @@ export default async function OwnerDashboardPage({ searchParams }: { searchParam
   const monthEnd = new Date(monthStart);
   monthEnd.setUTCMonth(monthEnd.getUTCMonth() + 1);
 
-  const [monthBookingsResult, weekBookingsResult, schedulesResult, courtsResult] = await Promise.all([
+  const [monthBookingsResult, weekBookingsResult, schedulesResult, courtsResult, billingResult] = await Promise.all([
     supabase
       .from("bookings")
-      .select("id, public_code, status, starts_at, ends_at, duration_minutes, remaining_balance_bob, venue_net_amount_bob, courts!bookings_court_id_fkey(name), profiles!bookings_player_id_fkey(first_name, last_name)")
+      .select("id, public_code, status, starts_at, ends_at, duration_minutes, total_price_bob, remaining_balance_bob, venue_net_amount_bob, courts!bookings_court_id_fkey(name), profiles!bookings_player_id_fkey(first_name, last_name)")
       .eq("venue_id", venue.id)
       .gte("starts_at", monthStart.toISOString())
       .lt("starts_at", monthEnd.toISOString())
@@ -139,6 +139,11 @@ export default async function OwnerDashboardPage({ searchParams }: { searchParam
       .select("id, name, status")
       .eq("venue_id", venue.id)
       .order("created_at"),
+    supabase
+      .from("venue_billing_accounts")
+      .select("available_balance_bob, reserved_balance_bob, status, low_balance_threshold_bob")
+      .eq("venue_id", venue.id)
+      .maybeSingle(),
   ]);
 
   const monthBookings = monthBookingsResult.data ?? [];
@@ -148,8 +153,11 @@ export default async function OwnerDashboardPage({ searchParams }: { searchParam
   const todayBookings = monthBookings.filter((booking) => dateKey(new Date(booking.starts_at)) === today && ACTIVE_BOOKING_STATUSES.has(booking.status));
   const actionableToday = todayBookings.filter((booking) => ACTIONABLE_BOOKING_STATUSES.has(booking.status));
   const monthCommercialBookings = monthBookings.filter((booking) => ACTIVE_BOOKING_STATUSES.has(booking.status));
-  const monthNetIncome = monthCommercialBookings.reduce((sum, booking) => sum + Number(booking.venue_net_amount_bob), 0);
+  const monthCollectedIncome = monthBookings
+    .filter((booking) => booking.status === "completed")
+    .reduce((sum, booking) => sum + Number(booking.total_price_bob), 0);
   const todayReceivable = actionableToday.reduce((sum, booking) => sum + Number(booking.remaining_balance_bob), 0);
+  const billing = billingResult.data;
   const bookedMinutes = monthCommercialBookings.reduce((sum, booking) => sum + booking.duration_minutes, 0);
   let capacityMinutes = 0;
 
@@ -188,9 +196,21 @@ export default async function OwnerDashboardPage({ searchParams }: { searchParam
       <section className="owner-kpi-grid" aria-label="Indicadores principales">
         <MetricCard tone="primary" label="Reservas de hoy" value={String(todayBookings.length)} detail={`${actionableToday.length} requieren seguimiento`} />
         <MetricCard label="Por cobrar hoy" value={`Bs ${formatBob(todayReceivable)}`} detail="Saldo en el complejo" />
-        <MetricCard label="Ocupación del mes" value={`${occupancy}%`} detail={`${monthCommercialBookings.length} reservas registradas`} />
-        <MetricCard label="Ingreso estimado" value={`Bs ${formatBob(monthNetIncome)}`} detail="Neto del complejo este mes" />
+        <MetricCard label="Ingreso cobrado" value={`Bs ${formatBob(monthCollectedIncome)}`} detail={`${occupancy}% de ocupación este mes`} />
+        <MetricCard label="Saldo CANCHEA" value={`Bs ${formatBob(Number(billing?.available_balance_bob ?? 0))}`} detail={`Bs ${formatBob(Number(billing?.reserved_balance_bob ?? 0))} retenidos`} />
       </section>
+
+      {billing?.status === "suspended" ? (
+        <div className="page-notice page-notice--error owner-status-notice">
+          Las reservas públicas están pausadas porque tu saldo CANCHEA no cubre nuevas comisiones.
+          <Link href="/propietario/facturacion">Ver saldo y recargar</Link>
+        </div>
+      ) : billing?.status === "low_balance" ? (
+        <div className="page-notice owner-status-notice">
+          Tu saldo CANCHEA está por agotarse. Recarga antes de que se pausen nuevas reservas.
+          <Link href="/propietario/facturacion">Revisar saldo</Link>
+        </div>
+      ) : null}
 
       {venue.status !== "approved" ? (
         <div className="page-notice page-notice--error owner-status-notice">
@@ -277,6 +297,7 @@ export default async function OwnerDashboardPage({ searchParams }: { searchParam
       </section>
 
       <section className="owner-quick-links" aria-label="Accesos de configuración">
+        <Link href="/propietario/facturacion"><strong>Saldo CANCHEA</strong><span>Consulta comisiones y recargas</span></Link>
         <Link href="/propietario/disponibilidad"><strong>Horarios y precios</strong><span>Define cuándo se puede reservar</span></Link>
         <Link href="/propietario"><strong>Datos del complejo</strong><span>Edita información y fotografías</span></Link>
         <Link href="/api/exports/owner/bookings"><strong>Exportar reservas</strong><span>Descarga el historial en CSV</span></Link>

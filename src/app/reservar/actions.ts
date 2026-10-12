@@ -37,71 +37,11 @@ export async function createBookingHoldAction(formData: FormData) {
   if (error || !data) {
     const safeReturn = returnPath.startsWith("/reservar?") ? returnPath : "/buscar";
     const separator = safeReturn.includes("?") ? "&" : "?";
-    redirect(`${safeReturn}${separator}estado=no-disponible`);
+    const state = error?.message.includes("VENUE_BALANCE_LOW") ? "complejo-sin-saldo" : "no-disponible";
+    redirect(`${safeReturn}${separator}estado=${state}`);
   }
 
   revalidatePath("/buscar");
   revalidatePath("/jugador");
-  redirect(`/reservar/${data.id}`);
-}
-
-export async function releaseBookingHoldAction(formData: FormData) {
-  const account = await getCurrentAccount();
-  if (!account) redirect("/auth/iniciar-sesion");
-  if (account.profile?.role !== "player") redirect("/cuenta");
-
-  const bookingId = value(formData, "booking_id");
-  if (!validUuid(bookingId)) redirect("/jugador");
-
-  const supabase = await createClient();
-  await supabase.rpc("release_my_booking_hold", { p_booking_id: bookingId });
-  revalidatePath("/buscar");
-  revalidatePath("/jugador");
-  redirect("/jugador?estado=hold-liberado");
-}
-
-export async function createMockPaymentOrderAction(formData: FormData) {
-  const account = await getCurrentAccount();
-  if (!account) redirect("/auth/iniciar-sesion");
-  if (account.profile?.role !== "player") redirect("/cuenta");
-
-  const bookingId = value(formData, "booking_id");
-  if (!validUuid(bookingId)) redirect("/jugador");
-
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("create_my_mock_payment_order", {
-    p_booking_id: bookingId,
-    p_idempotency_key: crypto.randomUUID(),
-  });
-
-  if (error || !data) redirect(`/reservar/${bookingId}?estado=pago-no-disponible`);
-
-  revalidatePath(`/reservar/${bookingId}`);
-  redirect(`/reservar/${bookingId}?estado=orden-creada`);
-}
-
-export async function simulateMockPaymentAction(formData: FormData) {
-  const account = await getCurrentAccount();
-  if (!account) redirect("/auth/iniciar-sesion");
-  if (account.profile?.role !== "player") redirect("/cuenta");
-
-  const bookingId = value(formData, "booking_id");
-  const paymentOrderId = value(formData, "payment_order_id");
-  if (!validUuid(bookingId) || !validUuid(paymentOrderId)) redirect("/jugador");
-
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("simulate_my_mock_payment", {
-    p_payment_order_id: paymentOrderId,
-    p_idempotency_key: crypto.randomUUID(),
-  });
-
-  const result = data && typeof data === "object" && !Array.isArray(data) ? data : null;
-  if (error || result?.payment_status !== "paid") {
-    redirect(`/reservar/${bookingId}?estado=pago-rechazado`);
-  }
-
-  revalidatePath(`/reservar/${bookingId}`);
-  revalidatePath("/jugador");
-  revalidatePath("/buscar");
-  redirect(`/reservar/${bookingId}?estado=pago-confirmado`);
+  redirect(`/reservar/${data.id}?estado=reserva-confirmada`);
 }

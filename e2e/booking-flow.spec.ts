@@ -60,9 +60,11 @@ test.describe("recorrido público de reserva", () => {
     await expect(page).toHaveURL(/\/buscar\?/);
     const firstResult = page.locator(".search-result-card").first();
     await expect(firstResult).toBeVisible({ timeout: 20_000 });
-    await expect(firstResult.getByText("Próximos horarios para reservar")).toBeVisible();
     await expect(firstResult.getByText("Verificado", { exact: true })).toBeVisible();
-    await firstResult.getByRole("link", { name: "Ver horarios" }).click();
+    await Promise.all([
+      page.waitForURL(/\/complejos\//, { timeout: 20_000 }),
+      firstResult.getByRole("link", { name: "Ver horarios" }).click(),
+    ]);
 
     await expect(page.locator("main h1")).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Secciones del complejo" })).toBeVisible();
@@ -150,11 +152,11 @@ test.describe("@authenticated inicio del jugador", () => {
   });
 });
 
-test.describe.serial("@authenticated reserva con pago Mock y trazabilidad por rol", () => {
+test.describe.serial("@authenticated reserva gratuita y trazabilidad por rol", () => {
   let bookingCode = "";
 
   test.skip(({ isMobile }) => Boolean(isMobile), "El flujo que crea datos se ejecuta una sola vez.");
-  test.skip(!playerPassword, "Define CANCHEA_TEST_PLAYER_PASSWORD para ejecutar el pago Mock.");
+  test.skip(!playerPassword, "Define CANCHEA_TEST_PLAYER_PASSWORD para ejecutar la reserva.");
 
   test("el jugador confirma una reserva y la ve en su historial", async ({ page }) => {
     await signIn(page, playerEmail, playerPassword!);
@@ -167,18 +169,16 @@ test.describe.serial("@authenticated reserva con pago Mock y trazabilidad por ro
     await expect(firstAvailableSlot).toBeVisible({ timeout: 20_000 });
     await firstAvailableSlot.click();
     await expect(page.getByRole("heading", { name: "Revisa tu reserva" })).toBeVisible();
-    await page.getByRole("button", { name: "Reservar y continuar al pago" }).click();
+    await page.getByRole("button", { name: "Confirmar reserva gratis" }).click();
 
-    await expect(page).toHaveURL(/\/reservar\/[0-9a-f-]{36}$/i, { timeout: 20_000 });
+    await expect(page).toHaveURL(/\/reservar\/[0-9a-f-]{36}\?estado=reserva-confirmada$/i, { timeout: 20_000 });
     const reservationHeading = page.locator(".private-heading h1");
     bookingCode = (await reservationHeading.textContent())?.replace(/^Reserva\s+/, "").trim() ?? "";
     expect(bookingCode).not.toBe("");
 
-    await page.getByRole("button", { name: "Generar pago de prueba" }).click();
-    await expect(page.getByRole("button", { name: "Simular pago aprobado" })).toBeVisible({ timeout: 20_000 });
-    await page.getByRole("button", { name: "Simular pago aprobado" }).click();
-    await expect(page.getByText("Pago de prueba confirmado.")).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText("Reserva asegurada")).toBeVisible();
+    await expect(page.getByText("Reserva confirmada. No realizaste ningún pago online.")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Tu horario está asegurado")).toBeVisible();
+    await expect(page.getByText(/directamente al complejo/)).toBeVisible();
 
     await page.goto("/jugador/reservas");
     await expect(page.getByText(bookingCode, { exact: true }).first()).toBeVisible();

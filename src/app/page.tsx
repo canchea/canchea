@@ -57,7 +57,7 @@ export default function Home() {
             <ol className="steps-list">
               <li><span>01</span><div><strong>Elige tu deporte</strong><p>Filtra por zona, fecha y hora.</p></div></li>
               <li><span>02</span><div><strong>Compara opciones</strong><p>Ve instalaciones, precio y disponibilidad.</p></div></li>
-              <li><span>03</span><div><strong>Asegura tu horario</strong><p>Reserva con una seña desde Bs 50.</p></div></li>
+              <li><span>03</span><div><strong>Asegura tu horario</strong><p>Reserva gratis y paga directamente en el complejo.</p></div></li>
             </ol>
           </div>
         </section>
